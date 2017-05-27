@@ -51,3 +51,10 @@ bin_ops = {
 
 for op_name, op in bin_ops.items():
     in_default_scope(op_name, bin_op(op))
+
+
+@in_default_scope("while")
+@curry
+def while_loop(scope: Scope, arg: Evalable, inner_scope: Scope, inner_arg: Evalable):
+    while arg.eval(scope):
+        inner_arg.eval(inner_scope)(inner_scope, ())
