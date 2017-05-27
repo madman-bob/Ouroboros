@@ -1,0 +1,21 @@
+= some-function {
+    print "Functions work";
+};
+print "After function definition, before function call";
+some-function();
+
+print "Call functions multiple times";
+some-function();
+
+= some-variable "Some variable in outer scope";
+{
+    # Scope test
+    # Using function as IIFE
+
+    = an-inner-variable "Assignment in functions work";
+    print an-inner-variable;
+
+    = some-variable "Variables in outer scope can be modified";
+}();
+# an-inner-variable doesn't exist here
+print some-variable;
