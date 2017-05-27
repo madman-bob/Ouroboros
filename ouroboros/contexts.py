@@ -3,7 +3,7 @@ from functools import reduce
 from context_base import ContextBase
 from evalable import Evalable
 from scope import Scope
-from tokens import Identifier
+from tokens import Identifier, IntToken
 
 
 class StatementContext(ContextBase):
@@ -18,6 +18,8 @@ class StatementContext(ContextBase):
             return CommentContext(self.iterator, "\n")
         elif pretoken == "\"":
             return StringContext(self.iterator, "\"")
+        elif pretoken.isdigit():
+            return IntToken(int(pretoken))
         else:
             return Identifier(pretoken)
 
