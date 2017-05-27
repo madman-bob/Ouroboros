@@ -14,16 +14,20 @@ class StatementContext(ContextBase):
             return BlockContext(self.iterator, ("}",))
         elif pretoken == "(":
             return StatementContext(self.iterator, ")")
+        elif pretoken == "#":
+            return CommentContext(self.iterator, "\n")
         elif pretoken == "\"":
             return StringContext(self.iterator, "\"")
         else:
             return Identifier(pretoken)
 
     def eval(self, scope: Scope):
-        if not self.ast:
+        ast = [token for token in self.ast if not isinstance(token, CommentContext)]
+
+        if not ast:
             return ()
 
-        ast = iter(self.ast)
+        ast = iter(ast)
 
         return reduce((lambda x, y: x(scope, y)), ast, next(ast).eval(scope))
 
@@ -46,6 +50,14 @@ class BlockContext(ContextBase):
                 subcontext.eval(inner_scope)
 
         return call
+
+
+class CommentContext(ContextBase):
+    whitespace = ""
+    special_pretokens = "\n"
+
+    def eval(self, scope: Scope):
+        pass
 
 
 class StringContext(ContextBase):
