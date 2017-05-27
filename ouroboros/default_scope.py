@@ -20,6 +20,17 @@ def inner_print(scope: Scope, arg: Evalable):
     print(arg.eval(scope))
 
 
+@in_default_scope("=")
+@curry
+def assign(scope: Scope, arg: Evalable, inner_scope: Scope, inner_arg: Evalable):
+    inner_val = inner_arg.eval(inner_scope)
+    if arg in scope:
+        scope[arg] = inner_val
+    else:
+        scope.define(arg, inner_val)
+    return inner_val
+
+
 @curry
 def bin_op(op, scope: Scope, arg: Evalable, inner_scope: Scope, inner_arg: Evalable):
     return op(arg.eval(scope), inner_arg.eval(inner_scope))
