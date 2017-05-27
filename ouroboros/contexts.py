@@ -14,6 +14,8 @@ class StatementContext(ContextBase):
             return BlockContext(self.iterator, ("}",))
         elif pretoken == "(":
             return StatementContext(self.iterator, ")")
+        elif pretoken == "\"":
+            return StringContext(self.iterator, "\"")
         else:
             return Identifier(pretoken)
 
@@ -44,3 +46,11 @@ class BlockContext(ContextBase):
                 subcontext.eval(inner_scope)
 
         return call
+
+
+class StringContext(ContextBase):
+    whitespace = ""
+    special_pretokens = "\""
+
+    def eval(self, scope: Scope):
+        return next(iter(self.ast), "")
