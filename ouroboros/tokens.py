@@ -8,3 +8,17 @@ class Token(Evalable):
 
     def __eq__(self, other):
         return type(self) == type(other) and self.__dict__ == other.__dict__
+
+
+class Identifier(Token):
+    def __init__(self, name):
+        self.name = name
+
+    def eval(self, scope: Scope):
+        return scope[self]
+
+    def __str__(self):
+        return self.name
+
+    def __hash__(self):
+        return hash(self.name)
