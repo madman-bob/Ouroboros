@@ -53,6 +53,15 @@ for op_name, op in bin_ops.items():
     in_default_scope(op_name, bin_op(op))
 
 
+@in_default_scope("if")
+@curry
+def if_statement(condition_scope: Scope, condition: Evalable, body_scope, body: Evalable):
+    if condition.eval(condition_scope):
+        result = body.eval(body_scope)(body_scope, ())
+        if result is not None:
+            return ReturnType(result)
+
+
 @in_default_scope("while")
 @curry
 def while_loop(scope: Scope, arg: Evalable, inner_scope: Scope, inner_arg: Evalable):
