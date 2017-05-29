@@ -57,4 +57,16 @@ for op_name, op in bin_ops.items():
 @curry
 def while_loop(scope: Scope, arg: Evalable, inner_scope: Scope, inner_arg: Evalable):
     while arg.eval(scope):
-        inner_arg.eval(inner_scope)(inner_scope, ())
+        result = inner_arg.eval(inner_scope)(inner_scope, ())
+        if result is not None:
+            return ReturnType(result)
+
+
+class ReturnType:
+    def __init__(self, return_value):
+        self.return_value = return_value
+
+
+@in_default_scope("return")
+def return_function(scope: Scope, arg: Evalable):
+    return ReturnType(arg.eval(scope))

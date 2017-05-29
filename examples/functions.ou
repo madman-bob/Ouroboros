@@ -7,6 +7,7 @@ some-function();
 print "Call functions multiple times";
 some-function();
 
+
 = some-variable "Some variable in outer scope";
 {
     # Scope test
@@ -19,3 +20,24 @@ some-function();
 }();
 # an-inner-variable doesn't exist here
 print some-variable;
+
+
+= return-value-test {
+    print "This line is run";
+    return "Return value";
+    print "This line isn't run";
+};
+print(return-value-test());
+
+
+= double-return {
+    # Weird stuff
+    return(return "Double return value");
+};
+
+= double-return-test {
+    double-return();
+    print "This line isn't run";
+};
+
+print(double-return-test());
