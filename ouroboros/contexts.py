@@ -4,7 +4,6 @@ from context_base import ContextBase
 from evalable import Evalable
 from scope import Scope
 from tokens import Identifier, IntToken
-from default_scope import ReturnType
 
 
 class StatementContext(ContextBase):
@@ -48,6 +47,7 @@ class BlockContext(ContextBase):
 
     def eval(self, scope: Scope):
         def call(calling_scope: Scope, arg: Evalable):
+            from default_scope import ReturnType
             inner_scope = Scope(parent_scope=scope)
             for subcontext in self.ast:
                 result = subcontext.eval(inner_scope)
