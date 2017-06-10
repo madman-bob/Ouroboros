@@ -5,6 +5,7 @@ from toolz import curry
 from evalable import Evalable
 from scope import Scope
 from tokens import Identifier
+from contexts import BlockContext
 
 default_scope = Scope()
 
@@ -79,3 +80,15 @@ class ReturnType:
 @in_default_scope("return")
 def return_function(scope: Scope, arg: Evalable):
     return ReturnType(arg.eval(scope))
+
+
+@in_default_scope("=>")
+@curry
+def function(_: Scope, argument_name: Evalable, body_scope: Scope, body: Evalable, calling_scope: Scope, argument: Evalable):
+    scope = Scope(parent_scope=body_scope)
+    scope.define(argument_name, argument.eval(calling_scope))
+
+    if isinstance(body, BlockContext):
+        return body.eval(scope)(scope, ())
+    else:
+        return body.eval(scope)

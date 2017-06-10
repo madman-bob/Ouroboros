@@ -30,6 +30,17 @@ print some-variable;
 print(return-value-test());
 
 
+= arg-test (=> x {
+    print x;
+});
+arg-test "Passed in as an argument";
+
+= multiple-arg-test (=> x (=> y {
+    print (+ x y);
+}));
+multiple-arg-test "Multiple " "arguments";
+
+
 = double-return {
     # Weird stuff
     return(return "Double return value");
