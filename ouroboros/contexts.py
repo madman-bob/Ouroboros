@@ -7,13 +7,15 @@ from tokens import Identifier, IntToken
 
 
 class StatementContext(ContextBase):
-    special_pretokens = ";{}()#\""
+    special_pretokens = ";{}()[]#\""
 
     def tokenizer(self, pretoken):
         if pretoken == "{":
             return BlockContext(self.iterator, ("}",))
         elif pretoken == "(":
             return StatementContext(self.iterator, ")")
+        elif pretoken == "[":
+            return ListContext(self.iterator, ("]",))
         elif pretoken == "#":
             return CommentContext(self.iterator, "\n")
         elif pretoken == "\"":
@@ -55,6 +57,23 @@ class BlockContext(ContextBase):
                     return result.return_value
 
         return call
+
+
+class ListContext(ContextBase):
+    special_pretokens = ","
+
+    def token_stream(self):
+        while self.iterator:
+            statement = StatementContext(self.iterator, self.end_pretokens + (",",))
+
+            if statement:
+                yield statement
+
+            if statement.end_pretoken != ",":
+                return
+
+    def eval(self, scope: Scope):
+        return [statement.eval(scope) for statement in self]
 
 
 class CommentContext(ContextBase):
