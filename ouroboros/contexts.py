@@ -7,7 +7,7 @@ from tokens import Identifier, IntToken
 
 
 class StatementContext(ContextBase):
-    special_pretokens = tuple(";{}()[]#\"")
+    special_pretokens = tuple(";{}()[]#\"") + ("/*", "*/")
 
     def tokenizer(self, pretoken):
         if pretoken == "{":
@@ -18,6 +18,8 @@ class StatementContext(ContextBase):
             return ListContext(self.iterator, "]")
         elif pretoken == "#":
             return CommentContext(self.iterator, "\n")
+        elif pretoken == "/*":
+            return CommentContext(self.iterator, ("*/",))
         elif pretoken == "\"":
             return StringContext(self.iterator, "\"")
         elif pretoken.isdigit():
