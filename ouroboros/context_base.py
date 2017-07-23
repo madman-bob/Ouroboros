@@ -6,13 +6,15 @@ from scope import Scope
 
 
 class ContextBase(Evalable):
-    whitespace = " \t\n"
+    whitespace = tuple(" \t\n")
     special_pretokens = ()
 
     def __init__(self, iterable, end_tokens=()):
         self.iterator = peekable(iterable)
-        self.end_pretokens = end_tokens
+        self.end_pretokens = tuple(end_tokens)
         self.end_pretoken = None
+
+        self.special_pretokens += self.end_pretokens
 
         self.ast
 
@@ -24,8 +26,6 @@ class ContextBase(Evalable):
         yielding special_pretokens, but not whitespace
 
         Ends when the iterator is exhausted, or one of the end_pretokens are reached
-
-        Currently only special_pretokens and end_pretokens of a single character are allowed
         """
         pretoken = ""
         for char in self.iterator:
@@ -33,18 +33,22 @@ class ContextBase(Evalable):
                 if pretoken:
                     yield pretoken
                     pretoken = ""
-            elif char in self.end_pretokens:
-                if pretoken:
-                    yield pretoken
-                self.end_pretoken = char
+                continue
+
+            pretoken += char
+
+            special_pretoken = next((special_pretoken for special_pretoken in self.special_pretokens if pretoken.endswith(special_pretoken)), None)
+            if special_pretoken is not None:
+                if pretoken != special_pretoken:
+                    yield pretoken[:len(pretoken) - len(special_pretoken)]
+                pretoken = ""
+
+            if special_pretoken in self.end_pretokens:
+                self.end_pretoken = special_pretoken
                 return
-            elif char in self.special_pretokens:
-                if pretoken:
-                    yield pretoken
-                    pretoken = ""
-                yield char
-            else:
-                pretoken += char
+
+            if special_pretoken is not None:
+                yield special_pretoken
         if pretoken:
             yield pretoken
 
