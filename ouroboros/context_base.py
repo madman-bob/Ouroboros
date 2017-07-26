@@ -1,8 +1,8 @@
 from cached_property import cached_property
 from more_itertools import peekable
 
-from evalable import Evalable
-from scope import Scope
+from ouroboros.evalable import Evalable
+from ouroboros.scope import Scope
 
 
 class ContextBase(Evalable):

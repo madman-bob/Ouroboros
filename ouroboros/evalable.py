@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
-from scope import Scope
+from ouroboros.scope import Scope
 
 
 class Evalable(metaclass=ABCMeta):

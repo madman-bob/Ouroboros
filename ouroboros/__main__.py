@@ -2,9 +2,9 @@ import sys
 
 import argparse
 
-from contexts import BlockContext
-from scope import Scope
-from default_scope import default_scope
+from ouroboros.contexts import BlockContext
+from ouroboros.scope import Scope
+from ouroboros.default_scope import default_scope
 
 parser = argparse.ArgumentParser()
 parser.add_argument('file', nargs='?', type=argparse.FileType('r'), default=sys.stdin)

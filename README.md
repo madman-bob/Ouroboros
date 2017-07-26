@@ -212,7 +212,7 @@ Then run
 
 Ouroboros is currently written as an interpreter, in Python.
 
-    python ouroboros [-h] [file]
+    python -m ouroboros [-h] [file]
 
 ## Examples
 

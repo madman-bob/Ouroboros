@@ -1,9 +1,9 @@
 from functools import reduce
 
-from context_base import ContextBase
-from evalable import Evalable
-from scope import Scope
-from tokens import Identifier, IntToken
+from ouroboros.context_base import ContextBase
+from ouroboros.evalable import Evalable
+from ouroboros.scope import Scope
+from ouroboros.tokens import Identifier, IntToken
 
 
 class StatementContext(ContextBase):
@@ -51,7 +51,7 @@ class BlockContext(ContextBase):
 
     def eval(self, scope: Scope):
         def call(calling_scope: Scope, arg: Evalable):
-            from default_scope import ReturnType
+            from ouroboros.default_scope import ReturnType
             inner_scope = Scope(parent_scope=scope)
             for subcontext in self.ast:
                 result = subcontext.eval(inner_scope)

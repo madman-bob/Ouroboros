@@ -2,10 +2,10 @@ from operator import add, sub, mul, truediv, eq, ne, lt, le, gt, ge
 
 from toolz import curry
 
-from evalable import Evalable
-from scope import Scope
-from tokens import Identifier
-from contexts import BlockContext
+from ouroboros.evalable import Evalable
+from ouroboros.scope import Scope
+from ouroboros.tokens import Identifier
+from ouroboros.contexts import BlockContext
 
 default_scope = Scope()
 

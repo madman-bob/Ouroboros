@@ -1,5 +1,5 @@
-from evalable import Evalable
-from scope import Scope
+from ouroboros.evalable import Evalable
+from ouroboros.scope import Scope
 
 
 class Token(Evalable):
