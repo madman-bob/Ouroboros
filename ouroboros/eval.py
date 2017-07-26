@@ -1,0 +1,13 @@
+from ouroboros.contexts import StatementContext, BlockContext
+from ouroboros.scope import Scope
+from ouroboros.default_scope import default_scope
+
+__all__ = ('ouroboros_eval', 'ouroboros_exec')
+
+
+def ouroboros_eval(expression_string):
+    return StatementContext(expression_string).eval(default_scope)
+
+
+def ouroboros_exec(expression_string):
+    return BlockContext(expression_string).eval(default_scope)(Scope(), ())

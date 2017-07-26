@@ -2,9 +2,7 @@ from contextlib import redirect_stdout
 from io import StringIO
 from unittest import TestCase
 
-from ouroboros.contexts import BlockContext
-from ouroboros.scope import Scope
-from ouroboros.default_scope import default_scope
+from ouroboros import ouroboros_exec
 
 
 class TestExamples(TestCase):
@@ -12,7 +10,7 @@ class TestExamples(TestCase):
     def run_example(example_path):
         example_output = StringIO()
         with redirect_stdout(example_output), open("../examples/" + example_path) as example_file:
-            BlockContext(example_file.read()).eval(default_scope)(Scope(), ())
+            ouroboros_exec(example_file.read())
         return example_output.getvalue()
 
     def test_basic_arithmetic(self):
