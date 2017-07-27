@@ -79,7 +79,6 @@ class ListContext(ContextBase):
 
 class CommentContext(ContextBase):
     whitespace = ()
-    special_pretokens = tuple("\n")
 
     def eval(self, scope: Scope):
         pass
@@ -87,7 +86,6 @@ class CommentContext(ContextBase):
 
 class StringContext(ContextBase):
     whitespace = ()
-    special_pretokens = tuple("\"")
 
     def eval(self, scope: Scope):
         return next(iter(self.ast), "")
