@@ -5,15 +5,24 @@ from ouroboros.evalable import Evalable
 from ouroboros.scope import Scope
 
 
+class ContextSwitch:
+    def __init__(self, start_pretoken, end_pretoken, context_class):
+        self.start_pretoken = start_pretoken
+        self.end_pretoken = end_pretoken
+        self.context_class = context_class
+
+
 class ContextBase(Evalable):
     whitespace = tuple(" \t\n")
     special_pretokens = ()
+    context_switches = ()
 
     def __init__(self, iterable, end_tokens=()):
         self.iterator = peekable(iterable)
         self.end_pretokens = tuple(end_tokens)
         self.end_pretoken = None
 
+        self.special_pretokens += tuple(context_switch.start_pretoken for context_switch in self.context_switches)
         self.special_pretokens += self.end_pretokens
 
         self.ast
@@ -60,7 +69,11 @@ class ContextBase(Evalable):
 
     def token_stream(self):
         for pretoken in self.splitter():
-            yield self.tokenizer(pretoken)
+            context_switch = next((context_switch for context_switch in self.context_switches if context_switch.start_pretoken == pretoken), None)
+            if context_switch is None:
+                yield self.tokenizer(pretoken)
+            else:
+                yield context_switch.context_class(self.iterator, (context_switch.end_pretoken,))
 
     @cached_property
     def ast(self):

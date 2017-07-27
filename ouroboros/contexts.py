@@ -1,28 +1,27 @@
 from functools import reduce
 
-from ouroboros.context_base import ContextBase
+from cached_property import cached_property
+
+from ouroboros.context_base import ContextBase, ContextSwitch
 from ouroboros.evalable import Evalable
 from ouroboros.scope import Scope
 from ouroboros.tokens import Identifier, IntToken
 
 
 class StatementContext(ContextBase):
-    special_pretokens = tuple(";{}()[]#\"") + ("/*", "*/")
+    @cached_property
+    def context_switches(self):
+        return (
+            ContextSwitch("{", "}", BlockContext),
+            ContextSwitch("(", ")", StatementContext),
+            ContextSwitch("[", "]", ListContext),
+            ContextSwitch("#", "\n", CommentContext),
+            ContextSwitch("/*", "*/", CommentContext),
+            ContextSwitch('"', '"', StringContext),
+        )
 
     def tokenizer(self, pretoken):
-        if pretoken == "{":
-            return BlockContext(self.iterator, "}")
-        elif pretoken == "(":
-            return StatementContext(self.iterator, ")")
-        elif pretoken == "[":
-            return ListContext(self.iterator, "]")
-        elif pretoken == "#":
-            return CommentContext(self.iterator, "\n")
-        elif pretoken == "/*":
-            return CommentContext(self.iterator, ("*/",))
-        elif pretoken == "\"":
-            return StringContext(self.iterator, "\"")
-        elif pretoken.isdigit():
+        if pretoken.isdigit():
             return IntToken(int(pretoken))
         else:
             return Identifier(pretoken)
