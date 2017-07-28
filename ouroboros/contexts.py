@@ -38,15 +38,11 @@ class StatementContext(ContextBase):
 
 
 class BlockContext(ContextBase):
-    def token_stream(self):
-        while self.iterator:
-            statement = StatementContext(self.iterator, self.end_pretokens + (";",))
-
-            if statement:
-                yield statement
-
-            if statement.end_pretoken != ";":
-                return
+    @cached_property
+    def context_switches(self):
+        return (
+            ContextSwitch("", ";", StatementContext, allow_implicit_end=True),
+        )
 
     def eval(self, scope: Scope):
         def call(calling_scope: Scope, arg: Evalable):
@@ -61,17 +57,11 @@ class BlockContext(ContextBase):
 
 
 class ListContext(ContextBase):
-    special_pretokens = tuple(",")
-
-    def token_stream(self):
-        while self.iterator:
-            statement = StatementContext(self.iterator, self.end_pretokens + (",",))
-
-            if statement:
-                yield statement
-
-            if statement.end_pretoken != ",":
-                return
+    @cached_property
+    def context_switches(self):
+        return (
+            ContextSwitch("", ",", StatementContext, allow_implicit_end=True),
+        )
 
     def eval(self, scope: Scope):
         return [statement.eval(scope) for statement in self]

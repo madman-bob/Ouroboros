@@ -6,10 +6,11 @@ from ouroboros.scope import Scope
 
 
 class ContextSwitch:
-    def __init__(self, start_pretoken, end_pretoken, context_class):
+    def __init__(self, start_pretoken, end_pretoken, context_class, allow_implicit_end=False):
         self.start_pretoken = start_pretoken
         self.end_pretoken = end_pretoken
         self.context_class = context_class
+        self.allow_implicit_end = allow_implicit_end
 
 
 class ContextBase(Evalable):
@@ -36,6 +37,11 @@ class ContextBase(Evalable):
 
         Ends when the iterator is exhausted, or one of the end_pretokens are reached
         """
+        if "" in self.special_pretokens:
+            while self.iterator:
+                yield ""
+            return
+
         pretoken = ""
         for char in self.iterator:
             if char in self.whitespace:
@@ -73,7 +79,16 @@ class ContextBase(Evalable):
             if context_switch is None:
                 yield self.tokenizer(pretoken)
             else:
-                yield context_switch.context_class(self.iterator, (context_switch.end_pretoken,))
+                new_context_end_pretokens = (context_switch.end_pretoken,)
+                if context_switch.allow_implicit_end:
+                    new_context_end_pretokens += self.end_pretokens
+
+                new_context = context_switch.context_class(self.iterator, new_context_end_pretokens)
+                yield new_context
+
+                if context_switch.allow_implicit_end and new_context.end_pretoken in self.end_pretokens:
+                    self.end_pretoken = new_context.end_pretoken
+                    return
 
     @cached_property
     def ast(self):
