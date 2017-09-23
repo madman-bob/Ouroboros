@@ -1,8 +1,7 @@
 from cached_property import cached_property
 from more_itertools import peekable
 
-from ouroboros.evalable import Evalable
-from ouroboros.scope import Scope
+from ouroboros.sentences import Sentence
 
 
 class ContextSwitch:
@@ -13,7 +12,7 @@ class ContextSwitch:
         self.allow_implicit_end = allow_implicit_end
 
 
-class ContextBase(Evalable):
+class ContextBase(Sentence):
     whitespace = tuple(" \t\n")
     special_pretokens = ()
     context_switches = ()
@@ -93,9 +92,6 @@ class ContextBase(Evalable):
     @cached_property
     def ast(self):
         return list(self.token_stream())
-
-    def eval(self, scope: Scope):
-        pass
 
     def __repr__(self):
         return "{}([{}])".format(

@@ -2,9 +2,9 @@ from operator import add, sub, mul, truediv, eq, ne, lt, le, gt, ge
 
 from toolz import curry
 
-from ouroboros.evalable import Evalable
 from ouroboros.scope import Scope
-from ouroboros.tokens import Identifier
+from ouroboros.sentences import Identifier
+from ouroboros.expressions import Expression
 from ouroboros.contexts import BlockContext
 
 default_scope = Scope()
@@ -17,24 +17,24 @@ def in_default_scope(variable_name, func):
 
 
 @in_default_scope("print")
-def inner_print(scope: Scope, arg: Evalable):
-    print(arg.eval(scope))
+def inner_print(expression: Expression):
+    print(expression.eval())
 
 
 @in_default_scope("=")
 @curry
-def assign(scope: Scope, arg: Evalable, inner_scope: Scope, inner_arg: Evalable):
-    inner_val = inner_arg.eval(inner_scope)
-    if arg in scope:
-        scope[arg] = inner_val
+def assign(left_expression: Expression, right_expression: Expression):
+    assignment_value = right_expression.eval()
+    if left_expression.sentence in left_expression.scope:
+        left_expression.scope[left_expression.sentence] = assignment_value
     else:
-        scope.define(arg, inner_val)
-    return inner_val
+        left_expression.scope.define(left_expression.sentence, assignment_value)
+    return assignment_value
 
 
 @curry
-def bin_op(op, scope: Scope, arg: Evalable, inner_scope: Scope, inner_arg: Evalable):
-    return op(arg.eval(scope), inner_arg.eval(inner_scope))
+def bin_op(op, left_expression: Expression, right_expression: Expression):
+    return op(left_expression.eval(), right_expression.eval())
 
 
 bin_ops = {
@@ -56,18 +56,18 @@ for op_name, op in bin_ops.items():
 
 @in_default_scope("if")
 @curry
-def if_statement(condition_scope: Scope, condition: Evalable, body_scope, body: Evalable):
-    if condition.eval(condition_scope):
-        result = body.eval(body_scope)(body_scope, ())
+def if_statement(condition: Expression, body: Expression):
+    if condition.eval():
+        result = body.eval()(())
         if result is not None:
             return ReturnType(result)
 
 
 @in_default_scope("while")
 @curry
-def while_loop(scope: Scope, arg: Evalable, inner_scope: Scope, inner_arg: Evalable):
-    while arg.eval(scope):
-        result = inner_arg.eval(inner_scope)(inner_scope, ())
+def while_loop(condition: Expression, body: Expression):
+    while condition.eval():
+        result = body.eval()(())
         if result is not None:
             return ReturnType(result)
 
@@ -78,17 +78,17 @@ class ReturnType:
 
 
 @in_default_scope("return")
-def return_function(scope: Scope, arg: Evalable):
-    return ReturnType(arg.eval(scope))
+def return_function(return_value: Expression):
+    return ReturnType(return_value.eval())
 
 
 @in_default_scope("=>")
 @curry
-def function(_: Scope, argument_name: Evalable, body_scope: Scope, body: Evalable, calling_scope: Scope, argument: Evalable):
-    scope = Scope(parent_scope=body_scope)
-    scope.define(argument_name, argument.eval(calling_scope))
+def function(argument_name: Expression, body: Expression, argument: Expression):
+    scope = Scope(parent_scope=body.scope)
+    scope.define(argument_name.sentence, argument.eval())
 
-    if isinstance(body, BlockContext):
-        return body.eval(scope)(scope, ())
+    if isinstance(body.sentence, BlockContext):
+        return body.sentence.eval(scope)(())
     else:
-        return body.eval(scope)
+        return body.sentence.eval(scope)

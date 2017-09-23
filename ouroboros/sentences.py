@@ -1,8 +1,9 @@
-from ouroboros.evalable import Evalable
+from abc import ABCMeta
+
 from ouroboros.scope import Scope
 
 
-class Token(Evalable):
+class Sentence(metaclass=ABCMeta):
     def eval(self, scope: Scope):
         pass
 
@@ -10,7 +11,7 @@ class Token(Evalable):
         return type(self) == type(other) and self.__dict__ == other.__dict__
 
 
-class Identifier(Token):
+class Identifier(Sentence):
     def __init__(self, name):
         self.name = name
 
@@ -20,11 +21,14 @@ class Identifier(Token):
     def __str__(self):
         return self.name
 
+    def __repr__(self):
+        return "`{}`".format(self.name)
+
     def __hash__(self):
         return hash(self.name)
 
 
-class IntToken(Token):
+class IntToken(Sentence):
     def __init__(self, value):
         self.value = value
 

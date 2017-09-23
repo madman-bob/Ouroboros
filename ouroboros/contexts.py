@@ -3,9 +3,9 @@ from functools import reduce
 from cached_property import cached_property
 
 from ouroboros.context_base import ContextBase, ContextSwitch
-from ouroboros.evalable import Evalable
+from ouroboros.sentences import Identifier, IntToken
 from ouroboros.scope import Scope
-from ouroboros.tokens import Identifier, IntToken
+from ouroboros.expressions import Expression
 
 
 class StatementContext(ContextBase):
@@ -34,7 +34,7 @@ class StatementContext(ContextBase):
 
         ast = iter(ast)
 
-        return reduce((lambda x, y: x(scope, y)), ast, next(ast).eval(scope))
+        return reduce((lambda x, y: x(Expression(y, scope))), ast, next(ast).eval(scope))
 
 
 class BlockContext(ContextBase):
@@ -45,7 +45,7 @@ class BlockContext(ContextBase):
         )
 
     def eval(self, scope: Scope):
-        def call(calling_scope: Scope, arg: Evalable):
+        def call(arg: Expression):
             from ouroboros.default_scope import ReturnType
             inner_scope = Scope(parent_scope=scope)
             for subcontext in self.ast:
