@@ -3,7 +3,3 @@ print some-variable;
 
 = some-variable "Variable modification works";
 print some-variable;
-
-= function-that-assigns-to-variable (= some-variable);
-function-that-assigns-to-variable "Weird stuff works";
-print some-variable;

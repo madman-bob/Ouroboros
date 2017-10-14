@@ -111,6 +111,5 @@ class TestExamples(TestCase):
             (
                 "Variable assignment works\n"
                 "Variable modification works\n"
-                "Weird stuff works\n"
             )
         )
