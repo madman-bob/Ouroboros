@@ -28,8 +28,11 @@ class Operator:
 
     @classmethod
     def reduce(cls, op_list):
-        while len(op_list) > 1:
+        while True:
             i_max, op_max = cls.find_max_precedence(op_list)
+
+            if i_max is None:
+                break
 
             args = []
             if op_max.consumes_previous:
@@ -46,6 +49,12 @@ class Operator:
         i_max, op_max = None, None
         for i, op in enumerate(iterable):
             if not isinstance(op, Operator):
+                continue
+
+            if i == 0 and op.consumes_previous:
+                continue
+
+            if i == len(iterable) - 1 and op.consumes_next:
                 continue
 
             if i_max is None or op.precedence > op_max.precedence or op.precedence == op_max.precedence and op.precedence.right_associative:
