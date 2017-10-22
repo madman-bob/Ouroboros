@@ -15,6 +15,9 @@ class Precedence:
     def __eq__(self, other):
         return type(self) is type(other) and self.label == other.label
 
+    def __repr__(self):
+        return "{}({}, {})".format(self.__class__.__name__, self.label, self.right_associative)
+
 
 class Operator:
     def __init__(self, precedence, func, consumes_previous=False, consumes_next=False):
@@ -61,6 +64,9 @@ class Operator:
                 i_max, op_max = i, op
 
         return i_max, op_max
+
+    def __repr__(self):
+        return "{}({!r}, {}, {}, {})".format(self.__class__.__name__, self.precedence, self.func, self.consumes_previous, self.consumes_next)
 
 
 class BinaryOperator(Operator):

@@ -1,4 +1,4 @@
-= some-function {
+some-function = {
     print "Functions work";
 };
 print "After function definition, before function call";
@@ -8,21 +8,21 @@ print "Call functions multiple times";
 some-function();
 
 
-= some-variable "Some variable in outer scope";
+some-variable = "Some variable in outer scope";
 {
     # Scope test
     # Using function as IIFE
 
-    = an-inner-variable "Assignment in functions work";
+    an-inner-variable = "Assignment in functions work";
     print an-inner-variable;
 
-    = some-variable "Variables in outer scope can be modified";
+    some-variable = "Variables in outer scope can be modified";
 }();
 # an-inner-variable doesn't exist here
 print some-variable;
 
 
-= return-value-test {
+return-value-test = {
     print "This line is run";
     return "Return value";
     print "This line isn't run";
@@ -30,23 +30,23 @@ print some-variable;
 print(return-value-test());
 
 
-= arg-test (=> x {
+arg-test = (x => {
     print x;
 });
 arg-test "Passed in as an argument";
 
-= multiple-arg-test (=> x (=> y {
-    print (+ x y);
+multiple-arg-test = (x => (y => {
+    print (x + y);
 }));
 multiple-arg-test "Multiple " "arguments";
 
 
-= double-return {
+double-return = {
     # Weird stuff
     return(return "Double return value");
 };
 
-= double-return-test {
+double-return-test = {
     double-return();
     print "This line isn't run";
 };

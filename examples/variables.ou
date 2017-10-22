@@ -1,5 +1,5 @@
-= some-variable "Variable assignment works";
+some-variable = "Variable assignment works";
 print some-variable;
 
-= some-variable "Variable modification works";
+some-variable = "Variable modification works";
 print some-variable;

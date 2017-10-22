@@ -27,8 +27,11 @@ class Identifier(Sentence):
     def __hash__(self):
         return hash(self.name)
 
+    def __bool__(self):
+        return bool(self.name)
 
-class IntToken(Sentence):
+
+class ConstantSentence(Sentence):
     def __init__(self, value):
         self.value = value
 
@@ -37,3 +40,7 @@ class IntToken(Sentence):
 
     def __str__(self):
         return str(self.value)
+
+
+class IntToken(ConstantSentence):
+    pass
