@@ -1,9 +1,5 @@
-= some-variable "Variable assignment works";
+some-variable = "Variable assignment works";
 print some-variable;
 
-= some-variable "Variable modification works";
-print some-variable;
-
-= function-that-assigns-to-variable (= some-variable);
-function-that-assigns-to-variable "Weird stuff works";
+some-variable = "Variable modification works";
 print some-variable;

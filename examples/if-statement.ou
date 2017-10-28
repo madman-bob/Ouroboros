@@ -1,15 +1,15 @@
-= if-test {
-    = i 0;
+if-test = {
+    i = 0;
 
-    if (< i 10) {
+    if (i < 10) {
         print "Entered first if";
     };
 
-    if (> i 10) {
+    if (i > 10) {
         print "This line isn't run";
     };
 
-    if (< i 10) {
+    if (i < 10) {
         return "Return value";
     };
 };

@@ -20,6 +20,10 @@ class TestBasicArithmetic(TestCase):
                 y = randrange(0, 10 ** 6)
                 with self.subTest(op=op, x=x, y=y):
                     self.assertEqual(
-                        ouroboros_eval("{} {} {}".format(op_symbol, x, y)),
+                        ouroboros_eval("{} {} {}".format(x, op_symbol, y)),
                         op(x, y)
                     )
+
+    def test_precedence(self):
+        self.assertEqual(ouroboros_eval("1 + 2 * 3"), 7)
+        self.assertEqual(ouroboros_eval("3 * 2 + 1"), 7)

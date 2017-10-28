@@ -6,6 +6,7 @@ from ouroboros.scope import Scope
 from ouroboros.sentences import Identifier
 from ouroboros.expressions import Expression
 from ouroboros.contexts import BlockContext
+from ouroboros.default_operators import Variable, FunctionExpression, BinaryExpression
 
 default_scope = Scope()
 
@@ -17,44 +18,42 @@ def in_default_scope(variable_name, func):
 
 
 @in_default_scope("print")
+@FunctionExpression.from_python_function
 def inner_print(expression: Expression):
     print(expression.eval())
 
 
 @in_default_scope("=")
+@BinaryExpression
 @curry
 def assign(left_expression: Expression, right_expression: Expression):
-    assignment_value = right_expression.eval()
-    if left_expression.sentence in left_expression.scope:
-        left_expression.scope[left_expression.sentence] = assignment_value
+    if not isinstance(left_expression, Variable):
+        raise TypeError("Trying to assign to non-variable")
+
+    assignment_value = right_expression.eval() if isinstance(right_expression, Expression) else right_expression
+    if left_expression.identifier in left_expression.scope:
+        left_expression.scope[left_expression.identifier] = assignment_value
     else:
-        left_expression.scope.define(left_expression.sentence, assignment_value)
+        left_expression.scope.define(left_expression.identifier, assignment_value)
     return assignment_value
 
 
-@curry
-def bin_op(op, left_expression: Expression, right_expression: Expression):
-    return op(left_expression.eval(), right_expression.eval())
+ou_add = in_default_scope("+", assign.insert_after(BinaryExpression.ouroboros_bin_op_from_python_bin_op(add)))
+ou_mul = in_default_scope("*", ou_add.insert_after(BinaryExpression.ouroboros_bin_op_from_python_bin_op(mul)))
 
+ou_sub = in_default_scope("-", ou_add.insert_after(BinaryExpression.ouroboros_bin_op_from_python_bin_op(sub)))
+ou_div = in_default_scope("/", ou_mul.insert_after(BinaryExpression.ouroboros_bin_op_from_python_bin_op(truediv)))
 
-bin_ops = {
-    "+": add,
-    "-": sub,
-    "*": mul,
-    "/": truediv,
-    "==": eq,
-    "!=": ne,
-    "<": lt,
-    "<=": le,
-    ">": gt,
-    ">=": ge,
-}
-
-for op_name, op in bin_ops.items():
-    in_default_scope(op_name, bin_op(op))
+ou_eq = in_default_scope("==", ou_add.insert_before(BinaryExpression.ouroboros_bin_op_from_python_bin_op(eq)))
+ou_ne = in_default_scope("!=", ou_eq.insert_equiv(BinaryExpression.ouroboros_bin_op_from_python_bin_op(ne)))
+ou_lt = in_default_scope("<", ou_eq.insert_equiv(BinaryExpression.ouroboros_bin_op_from_python_bin_op(lt)))
+ou_le = in_default_scope("<=", ou_eq.insert_equiv(BinaryExpression.ouroboros_bin_op_from_python_bin_op(le)))
+ou_gt = in_default_scope(">", ou_eq.insert_equiv(BinaryExpression.ouroboros_bin_op_from_python_bin_op(gt)))
+ou_ge = in_default_scope(">=", ou_eq.insert_equiv(BinaryExpression.ouroboros_bin_op_from_python_bin_op(ge)))
 
 
 @in_default_scope("if")
+@FunctionExpression.from_python_function
 @curry
 def if_statement(condition: Expression, body: Expression):
     if condition.eval():
@@ -64,6 +63,7 @@ def if_statement(condition: Expression, body: Expression):
 
 
 @in_default_scope("while")
+@FunctionExpression.from_python_function
 @curry
 def while_loop(condition: Expression, body: Expression):
     while condition.eval():
@@ -78,17 +78,14 @@ class ReturnType:
 
 
 @in_default_scope("return")
+@FunctionExpression.from_python_function
 def return_function(return_value: Expression):
     return ReturnType(return_value.eval())
 
 
 @in_default_scope("=>")
-@curry
-def function(argument_name: Expression, body: Expression, argument: Expression):
-    scope = Scope(parent_scope=body.scope)
-    scope.define(argument_name.sentence, argument.eval())
-
-    if isinstance(body.sentence, BlockContext):
-        return body.sentence.eval(scope)(())
-    else:
-        return body.sentence.eval(scope)
+@assign.insert_after(right_associative=True)
+def function(argument_name: Expression, body: Expression):
+    if isinstance(body, FunctionExpression) and isinstance(body.block, BlockContext) and body.arg_name is None:
+        return FunctionExpression(body.block, argument_name.scope, argument_name.identifier)
+    return FunctionExpression(body, argument_name.scope, argument_name.identifier)

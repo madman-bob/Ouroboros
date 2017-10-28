@@ -1,3 +1,4 @@
 cached-property
 more-itertools
 toolz
+ordering>=0.2.0

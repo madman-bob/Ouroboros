@@ -1,1 +1,1 @@
-print(+ "String concatenation " "works");
+print("String concatenation " + "works");
