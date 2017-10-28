@@ -12,9 +12,13 @@ default_scope = Scope()
 
 
 @curry
-def in_default_scope(variable_name, func):
-    default_scope.define(Identifier(variable_name), func)
-    return func
+def in_default_scope(variable_name, value):
+    default_scope.define(Identifier(variable_name), value)
+    return value
+
+
+in_default_scope("true", True)
+in_default_scope("false", False)
 
 
 @in_default_scope("print")
