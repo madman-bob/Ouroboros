@@ -3,7 +3,7 @@ print "Basic loop:";
 i = 0;
 while (i < 10) {
     print i;
-    i = (i + 1);
+    i = i + 1;
 };
 
 print "Fibonacci numbers:";
@@ -20,7 +20,7 @@ i = 0;
 while (i < 10) {
     a = b;
     b = c;
-    c = (a + b);
+    c = a + b;
     print c;
-    i = (i + 1);
+    i = i + 1;
 };

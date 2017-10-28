@@ -1,3 +1,7 @@
+from functools import wraps
+
+from toolz import curry
+
 from ordering import Ordering
 
 from ouroboros.sentences import Sentence, Identifier
@@ -75,8 +79,31 @@ operator_ordering.insert_after(ConstantExpression, FunctionExpression)
 
 
 class BinaryExpression(Expression):
-    def __init__(self, func):
-        super().__init__(Precedence(operator_ordering[BinaryExpression]), func, consumes_previous=True, consumes_next=True)
+    def __init__(self, func, precedence=None):
+        super().__init__(precedence or Precedence(operator_ordering[BinaryExpression]), func, consumes_previous=True, consumes_next=True)
+
+    @curry
+    def insert_before(self, func, right_associative=False):
+        precedence = Precedence(self.precedence.label.insert_before(object()), right_associative=right_associative)
+        return BinaryExpression(func, precedence)
+
+    @curry
+    def insert_after(self, func, right_associative=False):
+        precedence = Precedence(self.precedence.label.insert_after(object()), right_associative=right_associative)
+        return BinaryExpression(func, precedence)
+
+    def insert_equiv(self, func):
+        return BinaryExpression(self.ouroboros_bin_op_from_python_bin_op(func), self.precedence)
+
+    @classmethod
+    def ouroboros_bin_op_from_python_bin_op(cls, func):
+        @wraps(func)
+        def bin_op(left_expression, right_expression):
+            left_value = left_expression.eval() if isinstance(left_expression, Expression) else left_expression
+            right_value = right_expression.eval() if isinstance(right_expression, Expression) else right_expression
+            return func(left_value, right_value)
+
+        return bin_op
 
     def __call__(self, *args, **kwargs):
         value = self.func(*args, **kwargs)

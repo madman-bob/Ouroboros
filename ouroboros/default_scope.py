@@ -30,7 +30,7 @@ def assign(left_expression: Expression, right_expression: Expression):
     if not isinstance(left_expression, Variable):
         raise TypeError("Trying to assign to non-variable")
 
-    assignment_value = right_expression.eval()
+    assignment_value = right_expression.eval() if isinstance(right_expression, Expression) else right_expression
     if left_expression.identifier in left_expression.scope:
         left_expression.scope[left_expression.identifier] = assignment_value
     else:
@@ -38,26 +38,18 @@ def assign(left_expression: Expression, right_expression: Expression):
     return assignment_value
 
 
-@curry
-def bin_op(op, left_expression: Expression, right_expression: Expression):
-    return op(left_expression.eval(), right_expression.eval())
+ou_add = in_default_scope("+", assign.insert_after(BinaryExpression.ouroboros_bin_op_from_python_bin_op(add)))
+ou_mul = in_default_scope("*", ou_add.insert_after(BinaryExpression.ouroboros_bin_op_from_python_bin_op(mul)))
 
+ou_sub = in_default_scope("-", ou_add.insert_after(BinaryExpression.ouroboros_bin_op_from_python_bin_op(sub)))
+ou_div = in_default_scope("/", ou_mul.insert_after(BinaryExpression.ouroboros_bin_op_from_python_bin_op(truediv)))
 
-bin_ops = {
-    "+": add,
-    "-": sub,
-    "*": mul,
-    "/": truediv,
-    "==": eq,
-    "!=": ne,
-    "<": lt,
-    "<=": le,
-    ">": gt,
-    ">=": ge,
-}
-
-for op_name, op in bin_ops.items():
-    in_default_scope(op_name, BinaryExpression(bin_op(op)))
+ou_eq = in_default_scope("==", ou_add.insert_before(BinaryExpression.ouroboros_bin_op_from_python_bin_op(eq)))
+ou_ne = in_default_scope("!=", ou_eq.insert_equiv(BinaryExpression.ouroboros_bin_op_from_python_bin_op(ne)))
+ou_lt = in_default_scope("<", ou_eq.insert_equiv(BinaryExpression.ouroboros_bin_op_from_python_bin_op(lt)))
+ou_le = in_default_scope("<=", ou_eq.insert_equiv(BinaryExpression.ouroboros_bin_op_from_python_bin_op(le)))
+ou_gt = in_default_scope(">", ou_eq.insert_equiv(BinaryExpression.ouroboros_bin_op_from_python_bin_op(gt)))
+ou_ge = in_default_scope(">=", ou_eq.insert_equiv(BinaryExpression.ouroboros_bin_op_from_python_bin_op(ge)))
 
 
 @in_default_scope("if")
@@ -92,7 +84,7 @@ def return_function(return_value: Expression):
 
 
 @in_default_scope("=>")
-@BinaryExpression
+@assign.insert_after(right_associative=True)
 def function(argument_name: Expression, body: Expression):
     if isinstance(body, FunctionExpression) and isinstance(body.block, BlockContext) and body.arg_name is None:
         return FunctionExpression(body.block, argument_name.scope, argument_name.identifier)
