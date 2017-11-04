@@ -1,13 +1,3 @@
-some-function = {
-    print "Functions work";
-};
-print "After function definition, before function call";
-some-function();
-
-print "Call functions multiple times";
-some-function();
-
-
 some-variable = "Some variable in outer scope";
 {
     # Scope test
@@ -20,25 +10,6 @@ some-variable = "Some variable in outer scope";
 }();
 # an-inner-variable doesn't exist here
 print some-variable;
-
-
-return-value-test = {
-    print "This line is run";
-    return "Return value";
-    print "This line isn't run";
-};
-print(return-value-test());
-
-
-arg-test = (x => {
-    print x;
-});
-arg-test "Passed in as an argument";
-
-multiple-arg-test = (x => (y => {
-    print (x + y);
-}));
-multiple-arg-test "Multiple " "arguments";
 
 
 double-return = {

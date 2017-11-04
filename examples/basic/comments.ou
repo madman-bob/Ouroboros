@@ -1,0 +1,14 @@
+# This is a single line comment
+
+/*
+    This is a multi-line comment
+*/
+
+say_hello = {
+    /*
+        This function says "Hello"
+    */
+    print "Hello";
+};
+
+say_hello(); # Call the say_hello function

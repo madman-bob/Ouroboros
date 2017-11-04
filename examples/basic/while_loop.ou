@@ -1,0 +1,10 @@
+a = 0;
+b = 1;
+c = 1;
+
+while (b < 10) {
+    print b;
+    a = b;
+    b = c;
+    c = a + b;
+};

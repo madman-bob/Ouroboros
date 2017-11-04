@@ -1,0 +1,5 @@
+say_sum = x => y => {
+    print(x + y);
+};
+
+say_sum(1)(2);

@@ -1,0 +1,9 @@
+x = 1;
+
+if (x == 0) {
+    print "This shouldn't be printed";
+};
+
+if (x == 1) {
+    print "Hello";
+};

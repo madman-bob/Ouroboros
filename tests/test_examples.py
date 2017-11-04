@@ -28,75 +28,58 @@ class TestExamples(TestCase):
             )
         )
 
-    def test_functions(self):
-        self.assertEqual(
-            self.run_example("functions.ou"),
-            (
-                "After function definition, before function call\n"
-                "Functions work\n"
-                "Call functions multiple times\n"
-                "Functions work\n"
-                "Assignment in functions work\n"
-                "Variables in outer scope can be modified\n"
-                "This line is run\n"
-                "Return value\n"
-                "Passed in as an argument\n"
-                "Multiple arguments\n"
-                "Double return value\n"
-            )
-        )
-
     def test_hello_world(self):
         self.assertEqual(
-            self.run_example("hello-world.ou"),
+            self.run_example("basic/hello_world.ou"),
             "Hello, world\n"
+        )
+
+    def test_comments(self):
+        self.assertEqual(
+            self.run_example("basic/comments.ou"),
+            "Hello\n"
         )
 
     def test_if_statement(self):
         self.assertEqual(
-            self.run_example("if-statement.ou"),
-            (
-                "Entered first if\n"
-                "Return value\n"
-            )
+            self.run_example("basic/if_statement.ou"),
+            "Hello\n"
+        )
+
+    def test_while_loop(self):
+        self.assertEqual(
+            self.run_example("basic/while_loop.ou"),
+            "".join(str(n) + "\n" for n in [1, 1, 2, 3, 5, 8])
+        )
+
+    def test_function(self):
+        self.assertEqual(
+            self.run_example("basic/function.ou"),
+            "Hello\n"
+        )
+
+    def test_function_argument(self):
+        self.assertEqual(
+            self.run_example("basic/function_argument.ou"),
+            "Hello, world\n"
+        )
+
+    def test_function_arguments(self):
+        self.assertEqual(
+            self.run_example("basic/function_arguments.ou"),
+            "3\n"
+        )
+
+    def test_function_return_value(self):
+        self.assertEqual(
+            self.run_example("basic/function_return_value.ou"),
+            "3\n"
         )
 
     def test_lists(self):
         self.assertEqual(
             self.run_example("list.ou"),
             "[0, 1, 2, 3, 4]\n"
-        )
-
-    def test_loops(self):
-        self.assertEqual(
-            self.run_example("loops.ou"),
-            (
-                "Basic loop:\n"
-                "0\n"
-                "1\n"
-                "2\n"
-                "3\n"
-                "4\n"
-                "5\n"
-                "6\n"
-                "7\n"
-                "8\n"
-                "9\n"
-                "Fibonacci numbers:\n"
-                "1\n"
-                "1\n"
-                "2\n"
-                "3\n"
-                "5\n"
-                "8\n"
-                "13\n"
-                "21\n"
-                "34\n"
-                "55\n"
-                "89\n"
-                "144\n"
-                "233\n"
-            )
         )
 
     def test_strings(self):
