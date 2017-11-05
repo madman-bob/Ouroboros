@@ -1,0 +1,7 @@
+add = x => y => (x + y);
+
+add_2 = add 2;
+
+print(add_2 1);
+print(add_2 2);
+print(add_2 3);

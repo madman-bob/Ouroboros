@@ -1,0 +1,31 @@
+counter = {
+    /*
+        Returns a function, which returns successive integers every time it's called
+    */
+
+    i = 0;
+    return {
+        i = i + 1;
+        return i;
+    };
+};
+
+# Create a counter
+my_counter = counter();
+
+# Prints 1, 2, and 3, respectively
+print(my_counter());
+print(my_counter());
+print(my_counter());
+
+# This counter independent of previous counter
+another_counter = counter();
+
+# Prints 1, and 2, respectively
+print(another_counter());
+print(another_counter());
+
+# But we still have the old counter, as well
+# Prints 4, and 3, respectively
+print(my_counter());
+print(another_counter());

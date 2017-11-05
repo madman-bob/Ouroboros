@@ -96,3 +96,33 @@ class TestExamples(TestCase):
                 "Variable modification works\n"
             )
         )
+
+    def test_closure(self):
+        self.assertEqual(
+            self.run_example("intermediate/closure.ou"),
+            "".join(str(n) + "\n" for n in [1, 2, 3, 1, 2, 4, 3])
+        )
+
+    def test_currying(self):
+        self.assertEqual(
+            self.run_example("intermediate/currying.ou"),
+            "3\n4\n5\n"
+        )
+
+    def test_first_class_functions(self):
+        self.assertEqual(
+            self.run_example("intermediate/first_class_functions.ou"),
+            "Hello\nHello\n"
+        )
+
+    def test_primes(self):
+        self.assertEqual(
+            self.run_example("intermediate/primes.ou"),
+            "".join(str(n) + "\n" for n in [2, 3, 4, 5, 7, 9, 11, 13, 17, 19, 23, 25, 29, 31, 37, 41, 43, 47, 49, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97])
+        )
+
+    def test_fibonacci(self):
+        self.assertEqual(
+            self.run_example("intermediate/fibonacci.ou"),
+            "55\n55\n"
+        )

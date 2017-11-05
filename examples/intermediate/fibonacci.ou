@@ -1,0 +1,30 @@
+fibonacci_recursive = n => {
+    if (n < 2) {
+        return n;
+    };
+
+    return(fibonacci_recursive(n - 1) + fibonacci_recursive(n - 2));
+};
+
+fibonacci_iterative = n => {
+    if (n < 2) {
+        return n;
+    };
+
+    a = 0;
+    b = 1;
+    c = 1;
+    n = n - 2;
+
+    while (n > 0) {
+        a = b;
+        b = c;
+        c = a + b;
+        n = n - 1;
+    };
+
+    return c;
+};
+
+print(fibonacci_recursive 10);
+print(fibonacci_iterative 10);
