@@ -1,3 +1,4 @@
+import os
 from contextlib import redirect_stdout
 from io import StringIO
 from unittest import TestCase
@@ -6,10 +7,18 @@ from ouroboros import ouroboros_exec
 
 
 class TestExamples(TestCase):
-    @staticmethod
-    def run_example(example_path):
+    examples_directory = "../examples/"
+
+    @classmethod
+    def find_examples(cls):
+        for root, dirs, files in os.walk(cls.examples_directory):
+            for file_name in files:
+                yield os.path.join(root, file_name)
+
+    @classmethod
+    def run_example(cls, example_path):
         example_output = StringIO()
-        with redirect_stdout(example_output), open("../examples/" + example_path) as example_file:
+        with redirect_stdout(example_output), open(os.path.join(cls.examples_directory, example_path)) as example_file:
             ouroboros_exec(example_file.read())
         return example_output.getvalue()
 
@@ -30,6 +39,12 @@ class TestExamples(TestCase):
         "intermediate/brainfuck.ou": "2\n4\n",
         "advanced/double_return.ou": "55\n"
     }
+
+    def test_find_examples(self):
+        expected_examples = {os.path.abspath(os.path.join(self.examples_directory, example_path)) for example_path in self.example_outputs.keys()}
+        found_examples = {os.path.abspath(example_path) for example_path in self.find_examples()}
+
+        self.assertEqual(expected_examples, found_examples)
 
     def test_examples(self):
         for example_path, example_output in self.example_outputs.items():
