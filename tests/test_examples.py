@@ -132,3 +132,9 @@ class TestExamples(TestCase):
             self.run_example("intermediate/brainfuck.ou"),
             "2\n4\n"
         )
+
+    def test_double_return(self):
+        self.assertEqual(
+            self.run_example("advanced/double_return.ou"),
+            "55\n"
+        )
