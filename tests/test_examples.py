@@ -13,92 +13,28 @@ class TestExamples(TestCase):
             ouroboros_exec(example_file.read())
         return example_output.getvalue()
 
-    def test_hello_world(self):
-        self.assertEqual(
-            self.run_example("basic/hello_world.ou"),
-            "Hello, world\n"
-        )
+    example_outputs = {
+        "basic/hello_world.ou": "Hello, world\n",
+        "basic/comments.ou": "Hello\n",
+        "basic/if_statement.ou": "Hello\n",
+        "basic/while_loop.ou": "".join(str(n) + "\n" for n in [1, 1, 2, 3, 5, 8]),
+        "basic/function.ou": "Hello\n",
+        "basic/function_argument.ou": "Hello, world\n",
+        "basic/function_arguments.ou": "3\n",
+        "basic/function_return_value.ou": "3\n",
+        "intermediate/closure.ou": "".join(str(n) + "\n" for n in [1, 2, 3, 1, 2, 4, 3]),
+        "intermediate/currying.ou": "3\n4\n5\n",
+        "intermediate/first_class_functions.ou": "Hello\nHello\n",
+        "intermediate/primes.ou": "".join(str(n) + "\n" for n in [2, 3, 4, 5, 7, 9, 11, 13, 17, 19, 23, 25, 29, 31, 37, 41, 43, 47, 49, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]),
+        "intermediate/fibonacci.ou": "55\n55\n",
+        "intermediate/brainfuck.ou": "2\n4\n",
+        "advanced/double_return.ou": "55\n"
+    }
 
-    def test_comments(self):
-        self.assertEqual(
-            self.run_example("basic/comments.ou"),
-            "Hello\n"
-        )
-
-    def test_if_statement(self):
-        self.assertEqual(
-            self.run_example("basic/if_statement.ou"),
-            "Hello\n"
-        )
-
-    def test_while_loop(self):
-        self.assertEqual(
-            self.run_example("basic/while_loop.ou"),
-            "".join(str(n) + "\n" for n in [1, 1, 2, 3, 5, 8])
-        )
-
-    def test_function(self):
-        self.assertEqual(
-            self.run_example("basic/function.ou"),
-            "Hello\n"
-        )
-
-    def test_function_argument(self):
-        self.assertEqual(
-            self.run_example("basic/function_argument.ou"),
-            "Hello, world\n"
-        )
-
-    def test_function_arguments(self):
-        self.assertEqual(
-            self.run_example("basic/function_arguments.ou"),
-            "3\n"
-        )
-
-    def test_function_return_value(self):
-        self.assertEqual(
-            self.run_example("basic/function_return_value.ou"),
-            "3\n"
-        )
-
-    def test_closure(self):
-        self.assertEqual(
-            self.run_example("intermediate/closure.ou"),
-            "".join(str(n) + "\n" for n in [1, 2, 3, 1, 2, 4, 3])
-        )
-
-    def test_currying(self):
-        self.assertEqual(
-            self.run_example("intermediate/currying.ou"),
-            "3\n4\n5\n"
-        )
-
-    def test_first_class_functions(self):
-        self.assertEqual(
-            self.run_example("intermediate/first_class_functions.ou"),
-            "Hello\nHello\n"
-        )
-
-    def test_primes(self):
-        self.assertEqual(
-            self.run_example("intermediate/primes.ou"),
-            "".join(str(n) + "\n" for n in [2, 3, 4, 5, 7, 9, 11, 13, 17, 19, 23, 25, 29, 31, 37, 41, 43, 47, 49, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97])
-        )
-
-    def test_fibonacci(self):
-        self.assertEqual(
-            self.run_example("intermediate/fibonacci.ou"),
-            "55\n55\n"
-        )
-
-    def test_brainfuck(self):
-        self.assertEqual(
-            self.run_example("intermediate/brainfuck.ou"),
-            "2\n4\n"
-        )
-
-    def test_double_return(self):
-        self.assertEqual(
-            self.run_example("advanced/double_return.ou"),
-            "55\n"
-        )
+    def test_examples(self):
+        for example_path, example_output in self.example_outputs.items():
+            with self.subTest(example_path=example_path):
+                self.assertEqual(
+                    self.run_example(example_path),
+                    example_output
+                )
