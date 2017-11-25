@@ -13,21 +13,6 @@ class TestExamples(TestCase):
             ouroboros_exec(example_file.read())
         return example_output.getvalue()
 
-    def test_basic_arithmetic(self):
-        self.assertEqual(
-            self.run_example("basic-arithmetic.ou"),
-            (
-                "1 + 1 =\n"
-                "2\n"
-                "2 - 1 =\n"
-                "1\n"
-                "2 * 3 =\n"
-                "6\n"
-                "12 / 4 =\n"
-                "3.0\n"
-            )
-        )
-
     def test_hello_world(self):
         self.assertEqual(
             self.run_example("basic/hello_world.ou"),
@@ -74,27 +59,6 @@ class TestExamples(TestCase):
         self.assertEqual(
             self.run_example("basic/function_return_value.ou"),
             "3\n"
-        )
-
-    def test_lists(self):
-        self.assertEqual(
-            self.run_example("list.ou"),
-            "[0, 1, 2, 3, 4]\n"
-        )
-
-    def test_strings(self):
-        self.assertEqual(
-            self.run_example("strings.ou"),
-            "String concatenation works\n"
-        )
-
-    def test_variables(self):
-        self.assertEqual(
-            self.run_example("variables.ou"),
-            (
-                "Variable assignment works\n"
-                "Variable modification works\n"
-            )
         )
 
     def test_closure(self):
