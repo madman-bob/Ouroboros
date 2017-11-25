@@ -1,0 +1,120 @@
+cons = x => (xs => (choice => {
+    if choice {
+        return x;
+    };
+    return xs;
+}));
+
+car = list => (list true);
+cdr = list => (list false);
+
+nil = ();
+
+tape_cons = left => (right => (choice => {
+    if (choice == 0) {
+        return left;
+    };
+    if (choice == 1) {
+        return right;
+    };
+
+    if (nil == right) {
+        return 0;
+    };
+    return(car right);
+}));
+
+l_shift = tape => {
+    left = tape 0;
+    right = tape 1;
+
+    if (nil == left) {
+        return(tape_cons nil (cons 0 right));
+    };
+    return(tape_cons(cdr left)(cons(car left)(right)));
+};
+
+r_shift = tape => {
+    left = tape 0;
+    right = tape 1;
+
+    if (nil == right) {
+        return(tape_cons (cons 0 left) nil);
+    };
+    return(tape_cons(cons(car right)(left))(cdr right));
+};
+
+head = tape => (tape 2);
+set = tape => (value => {
+    left = tape 0;
+    right = tape 1;
+
+    if (nil == right) {
+        return(tape_cons left (cons value nil));
+    };
+    return(tape_cons left (cons value (cdr right)));
+});
+
+brainfuck = memory => (command_history => (skipping_depth => (command => {
+    new_command_history = (cons command command_history);
+
+    if (skipping_depth > 0) {
+        if (command == "[") {
+            return(brainfuck memory new_command_history (skipping_depth + 1));
+        };
+        if (command == "]") {
+            return(brainfuck memory new_command_history (skipping_depth - 1));
+        };
+    };
+
+    if (skipping_depth < 0) {
+        previous_command = car command_history;
+        previous_command_history = cdr command_history;
+
+        if (previous_command == "[") {
+            return(brainfuck memory previous_command_history (skipping_depth + 1) previous_command command);
+        };
+        if (previous_command == "]") {
+            return(brainfuck memory previous_command_history (skipping_depth - 1) previous_command command);
+        };
+        return(brainfuck memory previous_command_history skipping_depth previous_command command);
+    };
+
+    if (command == ".") {
+        print(head memory);
+    };
+
+    if (command == ">") {
+        return(brainfuck(r_shift memory) new_command_history skipping_depth);
+    };
+
+    if (command == "<") {
+        return(brainfuck(l_shift memory) new_command_history skipping_depth);
+    };
+
+    if (command == "+") {
+        return(brainfuck(set memory (head memory + 1)) new_command_history skipping_depth);
+    };
+
+    if (command == "-") {
+        return(brainfuck(set memory (head memory - 1)) new_command_history skipping_depth);
+    };
+
+    if (command == "[") {
+        if (head memory == 0) {
+            return(brainfuck memory new_command_history (skipping_depth + 1));
+        };
+    };
+
+    if (command == "]") {
+        if (head memory != 0) {
+            return(brainfuck memory command_history (skipping_depth - 1) command);
+        };
+    };
+
+    return(brainfuck memory new_command_history skipping_depth);
+})));
+
+Brainfuck = brainfuck (tape_cons nil nil) nil 0;
+
+Brainfuck "+" "+" "[" ">" "+" ">" "+" "+" "<" "<" "-" "]" ">" "." ">" ".";

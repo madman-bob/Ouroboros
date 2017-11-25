@@ -126,3 +126,9 @@ class TestExamples(TestCase):
             self.run_example("intermediate/fibonacci.ou"),
             "55\n55\n"
         )
+
+    def test_brainfuck(self):
+        self.assertEqual(
+            self.run_example("intermediate/brainfuck.ou"),
+            "2\n4\n"
+        )
