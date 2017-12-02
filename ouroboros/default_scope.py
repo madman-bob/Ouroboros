@@ -65,6 +65,8 @@ ou_and = in_default_scope("and", ou_eq.insert_before(BinaryExpression.ouroboros_
 ou_xor = in_default_scope("xor", ou_and.insert_before(BinaryExpression.ouroboros_bin_op_from_python_bin_op(xor)))
 ou_or = in_default_scope("or", ou_and.insert_before(BinaryExpression.ouroboros_bin_op_from_python_bin_op(or_)))
 
+ou_not = in_default_scope("not", FunctionExpression.from_python_function(lambda a: not a.eval()))
+
 
 @in_default_scope("if")
 @FunctionExpression.from_python_function
