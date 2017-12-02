@@ -45,6 +45,8 @@ class Operator:
 
             op_list[i_max - op_max.consumes_previous:i_max + 1 + op_max.consumes_next] = [op_max(*args)]
 
+        assert len(op_list) == 1
+
         return op_list[0]
 
     @classmethod
