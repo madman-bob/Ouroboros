@@ -1,4 +1,3 @@
-from cached_property import cached_property
 from functools import singledispatch
 
 from ouroboros.context_base import ContextBase, ContextSwitch
@@ -7,11 +6,12 @@ from ouroboros.scope import Scope
 from ouroboros.expressions import Expression
 from ouroboros.operators import Operator
 from ouroboros.default_operators import ConstantExpression, Variable, FunctionExpression
+from ouroboros.utils import cached_class_property
 
 
 class StatementContext(ContextBase):
-    @cached_property
-    def context_switches(self):
+    @cached_class_property
+    def context_switches(cls):
         return (
             ContextSwitch("{", "}", BlockContext),
             ContextSwitch("(", ")", StatementContext),
@@ -37,8 +37,8 @@ class StatementContext(ContextBase):
 
 
 class BlockContext(ContextBase):
-    @cached_property
-    def context_switches(self):
+    @cached_class_property
+    def context_switches(cls):
         return (
             ContextSwitch("", ";", StatementContext, allow_implicit_end=True),
         )
@@ -57,8 +57,8 @@ class BlockContext(ContextBase):
 
 
 class ListContext(ContextBase):
-    @cached_property
-    def context_switches(self):
+    @cached_class_property
+    def context_switches(cls):
         return (
             ContextSwitch("", ",", StatementContext, allow_implicit_end=True),
         )
