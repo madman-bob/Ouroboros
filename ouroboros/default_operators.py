@@ -4,7 +4,7 @@ from toolz import curry
 
 from ordering import Ordering
 
-from ouroboros.sentences import Sentence, Identifier
+from ouroboros.sentences import Sentence, Identifier, eval_sentence
 from ouroboros.scope import Scope
 from ouroboros.operators import Precedence
 from ouroboros.expressions import Expression
@@ -17,7 +17,7 @@ class ConstantExpression(Expression):
         self.sentence = sentence
         self.scope = scope
 
-        super().__init__(Precedence(operator_ordering[ConstantExpression]), lambda: self.sentence.eval(self.scope))
+        super().__init__(Precedence(operator_ordering[ConstantExpression]), lambda: eval_sentence(self.sentence, self.scope))
 
 
 operator_ordering.insert_start(ConstantExpression)
@@ -58,11 +58,11 @@ class FunctionExpression(Expression):
             self.block.scope = inner_scope
 
         if isinstance(self.block, BlockContext):
-            value = self.block.eval(inner_scope).block(())
+            value = eval_sentence(self.block, inner_scope).block(())
         elif isinstance(self.block, Expression):
             value = self.block.eval()
         elif isinstance(self.block, Sentence):
-            value = self.block.eval(inner_scope)
+            value = eval_sentence(self.block, inner_scope)
         else:
             value = self.block(arg)
 

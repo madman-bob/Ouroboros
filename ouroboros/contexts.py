@@ -3,7 +3,7 @@ from functools import singledispatch
 from namedlist import namedtuple
 
 from ouroboros.context_base import ContextBase, ContextSwitch
-from ouroboros.sentences import Sentence, Identifier, IntToken
+from ouroboros.sentences import Sentence, Identifier, IntToken, eval_sentence
 from ouroboros.scope import Scope
 from ouroboros.expressions import Expression
 from ouroboros.operators import Operator
@@ -32,14 +32,6 @@ class StatementContext(ContextBase, namedtuple('StatementContext', ['terms', ('e
         else:
             return Identifier(pretoken)
 
-    def eval(self, scope: Scope):
-        expressions = [get_expression(token, scope) for token in self.terms if not isinstance(token, CommentContext)]
-
-        if not expressions:
-            return ()
-
-        return Operator.reduce(expressions)
-
 
 class BlockContext(ContextBase, namedtuple('BlockContext', ['statements', ('end_pretoken', None)])):
     @cached_class_property
@@ -48,18 +40,6 @@ class BlockContext(ContextBase, namedtuple('BlockContext', ['statements', ('end_
             ContextSwitch("", ";", StatementContext, allow_implicit_end=True),
         )
 
-    def eval(self, scope: Scope):
-        @FunctionExpression.from_python_function
-        def call(arg: Expression):
-            from ouroboros.default_scope import ReturnType
-            inner_scope = Scope(parent_scope=scope)
-            for subcontext in self.statements:
-                result = subcontext.eval(inner_scope)
-                if isinstance(result, ReturnType):
-                    return result.return_value
-
-        return call
-
 
 class ListContext(ContextBase, namedtuple('ListContext', ['values', ('end_pretoken', None)])):
     @cached_class_property
@@ -67,9 +47,6 @@ class ListContext(ContextBase, namedtuple('ListContext', ['values', ('end_pretok
         return (
             ContextSwitch("", ",", StatementContext, allow_implicit_end=True),
         )
-
-    def eval(self, scope: Scope):
-        return [statement.eval(scope) for statement in self.values]
 
 
 class CommentContext(ContextBase, namedtuple('CommentContext', ['comment_text', ('end_pretoken', None)])):
@@ -80,9 +57,6 @@ class CommentContext(ContextBase, namedtuple('CommentContext', ['comment_text', 
         assert len(tokens) <= 1
         return cls(tokens[0] if tokens else "", end_pretoken=end_pretoken)
 
-    def eval(self, scope: Scope):
-        pass
-
 
 class StringContext(ContextBase, namedtuple('StringContext', ['value', ('end_pretoken', None)])):
     whitespace = ()
@@ -91,8 +65,44 @@ class StringContext(ContextBase, namedtuple('StringContext', ['value', ('end_pre
     def from_tokens(cls, tokens, end_pretoken=None):
         return cls("".join(tokens), end_pretoken=end_pretoken)
 
-    def eval(self, scope: Scope):
-        return self.value
+
+@eval_sentence.register(StatementContext)
+def _(sentence: StatementContext, scope: Scope) -> object:
+    expressions = [get_expression(token, scope) for token in sentence.terms if not isinstance(token, CommentContext)]
+
+    if not expressions:
+        return ()
+
+    return Operator.reduce(expressions)
+
+
+@eval_sentence.register(BlockContext)
+def _(sentence: BlockContext, scope: Scope) -> object:
+    @FunctionExpression.from_python_function
+    def call(arg: Expression):
+        from ouroboros.default_scope import ReturnType
+        inner_scope = Scope(parent_scope=scope)
+        for subcontext in sentence.statements:
+            result = eval_sentence(subcontext, inner_scope)
+            if isinstance(result, ReturnType):
+                return result.return_value
+
+    return call
+
+
+@eval_sentence.register(ListContext)
+def _(sentence: ListContext, scope: Scope) -> object:
+    return [eval_sentence(statement, scope) for statement in sentence.values]
+
+
+@eval_sentence.register(CommentContext)
+def _(sentence: CommentContext, scope: Scope) -> object:
+    pass
+
+
+@eval_sentence.register(StringContext)
+def _(sentence: StringContext, scope: Scope) -> object:
+    return sentence.value
 
 
 @singledispatch
@@ -103,7 +113,7 @@ def get_expression(sentence: Sentence, scope: Scope) -> Expression:
 @get_expression.register(Identifier)
 def _(sentence: Identifier, scope: Scope) -> Expression:
     if sentence in scope:
-        value = sentence.eval(scope)
+        value = eval_sentence(sentence, scope)
 
         if isinstance(value, Expression):
             return Variable(sentence, scope, precedence=value.precedence)
