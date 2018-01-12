@@ -5,8 +5,8 @@ __all__ = ('ouroboros_eval', 'ouroboros_exec')
 
 
 def ouroboros_eval(expression_string):
-    return StatementContext(expression_string).eval(default_scope)
+    return StatementContext.parse(expression_string).eval(default_scope)
 
 
 def ouroboros_exec(expression_string):
-    return BlockContext(expression_string).eval(default_scope)(())
+    return BlockContext.parse(expression_string).eval(default_scope)(())
