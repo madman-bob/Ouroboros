@@ -1,5 +1,7 @@
 from abc import ABCMeta
 
+from namedlist import namedtuple
+
 from ouroboros.scope import Scope
 
 
@@ -7,14 +9,8 @@ class Sentence(metaclass=ABCMeta):
     def eval(self, scope: Scope):
         pass
 
-    def __eq__(self, other):
-        return type(self) == type(other) and self.__dict__ == other.__dict__
 
-
-class Identifier(Sentence):
-    def __init__(self, name):
-        self.name = name
-
+class Identifier(Sentence, namedtuple('Identifier', 'name')):
     def eval(self, scope: Scope):
         return scope[self]
 
@@ -24,17 +20,11 @@ class Identifier(Sentence):
     def __repr__(self):
         return "`{}`".format(self.name)
 
-    def __hash__(self):
-        return hash(self.name)
-
     def __bool__(self):
         return bool(self.name)
 
 
-class ConstantSentence(Sentence):
-    def __init__(self, value):
-        self.value = value
-
+class ConstantSentence(Sentence, namedtuple('ConstantSentence', 'value')):
     def eval(self, scope: Scope):
         return self.value
 

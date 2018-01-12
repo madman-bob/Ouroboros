@@ -1,5 +1,7 @@
 from functools import singledispatch
 
+from namedlist import namedtuple
+
 from ouroboros.context_base import ContextBase, ContextSwitch
 from ouroboros.sentences import Sentence, Identifier, IntToken
 from ouroboros.scope import Scope
@@ -9,7 +11,7 @@ from ouroboros.default_operators import ConstantExpression, Variable, FunctionEx
 from ouroboros.utils import cached_class_property
 
 
-class StatementContext(ContextBase):
+class StatementContext(ContextBase, namedtuple('StatementContext', ['terms', ('end_pretoken', None)])):
     @cached_class_property
     def context_switches(cls):
         return (
@@ -21,14 +23,17 @@ class StatementContext(ContextBase):
             ContextSwitch('"', '"', StringContext),
         )
 
-    def tokenizer(self, pretoken):
-        if pretoken.isdigit():
+    @classmethod
+    def parse_pretoken(cls, pretoken):
+        if isinstance(pretoken, ContextBase):
+            return pretoken
+        elif pretoken.isdigit():
             return IntToken(int(pretoken))
         else:
             return Identifier(pretoken)
 
     def eval(self, scope: Scope):
-        expressions = [get_expression(token, scope) for token in self.ast if not isinstance(token, CommentContext)]
+        expressions = [get_expression(token, scope) for token in self.terms if not isinstance(token, CommentContext)]
 
         if not expressions:
             return ()
@@ -36,7 +41,7 @@ class StatementContext(ContextBase):
         return Operator.reduce(expressions)
 
 
-class BlockContext(ContextBase):
+class BlockContext(ContextBase, namedtuple('BlockContext', ['statements', ('end_pretoken', None)])):
     @cached_class_property
     def context_switches(cls):
         return (
@@ -48,7 +53,7 @@ class BlockContext(ContextBase):
         def call(arg: Expression):
             from ouroboros.default_scope import ReturnType
             inner_scope = Scope(parent_scope=scope)
-            for subcontext in self.ast:
+            for subcontext in self.statements:
                 result = subcontext.eval(inner_scope)
                 if isinstance(result, ReturnType):
                     return result.return_value
@@ -56,7 +61,7 @@ class BlockContext(ContextBase):
         return call
 
 
-class ListContext(ContextBase):
+class ListContext(ContextBase, namedtuple('ListContext', ['values', ('end_pretoken', None)])):
     @cached_class_property
     def context_switches(cls):
         return (
@@ -64,21 +69,30 @@ class ListContext(ContextBase):
         )
 
     def eval(self, scope: Scope):
-        return [statement.eval(scope) for statement in self]
+        return [statement.eval(scope) for statement in self.values]
 
 
-class CommentContext(ContextBase):
+class CommentContext(ContextBase, namedtuple('CommentContext', ['comment_text', ('end_pretoken', None)])):
     whitespace = ()
+
+    @classmethod
+    def from_tokens(cls, tokens, end_pretoken=None):
+        assert len(tokens) <= 1
+        return cls(tokens[0] if tokens else "", end_pretoken=end_pretoken)
 
     def eval(self, scope: Scope):
         pass
 
 
-class StringContext(ContextBase):
+class StringContext(ContextBase, namedtuple('StringContext', ['value', ('end_pretoken', None)])):
     whitespace = ()
 
+    @classmethod
+    def from_tokens(cls, tokens, end_pretoken=None):
+        return cls("".join(tokens), end_pretoken=end_pretoken)
+
     def eval(self, scope: Scope):
-        return next(iter(self.ast), "")
+        return self.value
 
 
 @singledispatch
