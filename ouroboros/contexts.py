@@ -24,13 +24,13 @@ class StatementContext(ContextBase, namedtuple('StatementContext', ['terms'])):
         )
 
     @classmethod
-    def parse_pretoken(cls, pretoken):
-        if isinstance(pretoken, ContextBase):
-            return pretoken
-        elif pretoken.isdigit():
-            return IntToken(int(pretoken))
+    def parse_token(cls, token):
+        if isinstance(token, ContextBase):
+            return token
+        elif token.isdigit():
+            return IntToken(int(token))
         else:
-            return Identifier(pretoken)
+            return Identifier(token)
 
 
 class BlockContext(ContextBase, namedtuple('BlockContext', ['statements'])):
