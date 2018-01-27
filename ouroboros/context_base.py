@@ -88,11 +88,11 @@ class ContextBase(Sentence, metaclass=ABCMeta):
                 if context_switch.allow_implicit_end:
                     new_context_end_pretokens += end_tokens
 
-                new_context = context_switch.context_class.parse(tokenizer.iterator, new_context_end_pretokens)
+                new_context, end_token = context_switch.context_class.parse(tokenizer.iterator, new_context_end_pretokens)
                 yield new_context
 
-                if context_switch.allow_implicit_end and new_context.end_pretoken in end_tokens:
-                    yield new_context.end_pretoken
+                if context_switch.allow_implicit_end and end_token in end_tokens:
+                    yield end_token
                     return
 
     @classmethod
@@ -100,8 +100,8 @@ class ContextBase(Sentence, metaclass=ABCMeta):
         return pretoken
 
     @classmethod
-    def from_tokens(cls, tokens, end_pretoken=None):
-        return cls(tokens, end_pretoken=end_pretoken)
+    def from_tokens(cls, tokens):
+        return cls(tokens)
 
     @classmethod
     def parse(cls, iterable, end_tokens=()):
@@ -114,4 +114,4 @@ class ContextBase(Sentence, metaclass=ABCMeta):
         if tokens and tokens[-1] in end_tokens:
             end_token = tokens.pop()
 
-        return cls.from_tokens(tokens, end_pretoken=end_token)
+        return cls.from_tokens(tokens), end_token

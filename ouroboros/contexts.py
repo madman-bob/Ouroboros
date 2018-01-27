@@ -11,7 +11,7 @@ from ouroboros.default_operators import ConstantExpression, Variable, FunctionEx
 from ouroboros.utils import cached_class_property
 
 
-class StatementContext(ContextBase, namedtuple('StatementContext', ['terms', ('end_pretoken', None)])):
+class StatementContext(ContextBase, namedtuple('StatementContext', ['terms'])):
     @cached_class_property
     def context_switches(cls):
         return (
@@ -33,7 +33,7 @@ class StatementContext(ContextBase, namedtuple('StatementContext', ['terms', ('e
             return Identifier(pretoken)
 
 
-class BlockContext(ContextBase, namedtuple('BlockContext', ['statements', ('end_pretoken', None)])):
+class BlockContext(ContextBase, namedtuple('BlockContext', ['statements'])):
     @cached_class_property
     def context_switches(cls):
         return (
@@ -41,7 +41,7 @@ class BlockContext(ContextBase, namedtuple('BlockContext', ['statements', ('end_
         )
 
 
-class ListContext(ContextBase, namedtuple('ListContext', ['values', ('end_pretoken', None)])):
+class ListContext(ContextBase, namedtuple('ListContext', ['values'])):
     @cached_class_property
     def context_switches(cls):
         return (
@@ -49,21 +49,21 @@ class ListContext(ContextBase, namedtuple('ListContext', ['values', ('end_pretok
         )
 
 
-class CommentContext(ContextBase, namedtuple('CommentContext', ['comment_text', ('end_pretoken', None)])):
+class CommentContext(ContextBase, namedtuple('CommentContext', ['comment_text'])):
     whitespace = ()
 
     @classmethod
-    def from_tokens(cls, tokens, end_pretoken=None):
+    def from_tokens(cls, tokens):
         assert len(tokens) <= 1
-        return cls(tokens[0] if tokens else "", end_pretoken=end_pretoken)
+        return cls(tokens[0] if tokens else "")
 
 
-class StringContext(ContextBase, namedtuple('StringContext', ['value', ('end_pretoken', None)])):
+class StringContext(ContextBase, namedtuple('StringContext', ['value'])):
     whitespace = ()
 
     @classmethod
-    def from_tokens(cls, tokens, end_pretoken=None):
-        return cls("".join(tokens), end_pretoken=end_pretoken)
+    def from_tokens(cls, tokens):
+        return cls("".join(tokens))
 
 
 @eval_sentence.register(StatementContext)
