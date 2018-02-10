@@ -203,7 +203,7 @@ To demonstrate this, I'd like to be able to start with something C-like, and end
 ## Setup
 
 Ensure Python is installed.
-Ouroboros is developed in Python 3.5, but may work in other versions.
+Ouroboros is developed in Python 3.6, but may work in other versions.
 Then run
 
     pip install -r requirements.txt
