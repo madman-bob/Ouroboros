@@ -12,6 +12,38 @@ This gives powerful tools to programmers, so it will be possible for people to w
 That said, it is possible to write really bad code in any language.
 As with all powerful tools, it's up to the user not to hurt themselves.
 
+## Expressiveness
+
+### Control structures
+
+For most purposes, the standard control structures suffice.
+But every now and again, you need a control structure that doesn't quite fit.
+As Ouroboros blocks are just functions, this means you can write your own control structures.
+
+For example:
+
+```
+do_twice = f => {
+    f();
+    f();
+};
+```
+
+defines a `do_twice` control structure, that runs its block twice.
+You can then use it like so:
+
+```
+a = 0;
+
+do_twice {
+    a = a + 1;
+};
+
+print(a);
+```
+
+which prints `2`.
+
 ## Technical ideas
 
 Some technical ideas of language features to come:
