@@ -1,13 +1,16 @@
 # Ouroboros
 
-Ouroboros is an experimental programming language.
+Ouroboros is an expressive interpreted programming language, for general purpose programming.
+It focuses on bringing the power of Lisp, with the familiarity of C-based languages.
+If the word "boilerplate" is ever used to describe an Ouroboros program, then I've done something wrong.
 
-It will attempt to abstract away things that most languages do not, and experiment with what powerful tools this gives programmers.
-As such, it will be possible for people to write *really* bad code in this language.
+Part of the expressiveness comes from Ouroboros having no reserved words.
+What, in many languages, are reserved words, are instead in Ouroboros variables.
+As such, this gives programmers the ability to create their own custom structures, of similar power.
 
+This gives powerful tools to programmers, so it will be possible for people to write *really* bad code in this language.
 That said, it is possible to write really bad code in any language.
-Like a sharp knife, this will be a powerful tool.
-We make no attempt to stop this, it's up to the user not to cut themselves.
+As with all powerful tools, it's up to the user not to hurt themselves.
 
 ## Technical ideas
 
