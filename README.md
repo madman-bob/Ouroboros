@@ -44,6 +44,39 @@ print(a);
 
 which prints `2`.
 
+### Simplify component communication
+
+Through use of decorators and compile time variables, can write code for multiple systems as though they're just one.
+
+For example, you can define the decorator:
+
+```
+ServerSideFunction = path => f => {
+    if (IS_SERVER) {
+        my_server.serve(path, f);
+        return f;
+    } else {
+        return () => http.get(path);
+    };
+};
+```
+
+and decorate functions like so:
+
+```
+get_current_user = ServerSideFunction("/user") {
+    # Do stuff with db to get user
+};
+```
+
+Then the server-side code presents the `/user` endpoint, and when `get_current_user` is called, it calls the database directly.
+Meanwhile, in the client-side code, this function instead makes a HTTP GET call to that same endpoint.
+
+This is similar to the Javascript idea of "isomorphic code".
+
+Further, there is no need to restrict ourselves to a client-server relationship.
+We could write code for an arbitrary number of components, as though they were all on the same machine.
+
 ## Technical ideas
 
 Some technical ideas of language features to come:
