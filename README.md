@@ -126,6 +126,30 @@ wrap_css = content => {
 but with less boilerplate, and more robust.
 If you want to extend `wrap_tag` to take more arguments, then the curried form allows you to do so easily, while the non-curried form requires you update both `wrap_js`, and `wrap_css` as well.
 
+### Change the syntax
+
+Don't like the default name for assignment?
+As there are no reserved words, you can assign anything you want to another variable name.
+
+For example:
+
+```
+equals = =;
+
+hello equals "Hello";
+say equals print;
+
+say hello;
+```
+
+will indeed print `Hello`.
+
+This allows you to warp the language to whatever your specific use-case may be.
+
+Naturally, this will increase onboarding time for new programmers in your codebase.
+But these sorts of domain specific issues would otherwise be encoded in functions, and objects.
+As they'll exist, anyway, it's better to bring them out into the open.
+
 ## Technical ideas
 
 Some technical ideas of language features to come:
