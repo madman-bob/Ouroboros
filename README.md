@@ -150,6 +150,50 @@ Naturally, this will increase onboarding time for new programmers in your codeba
 But these sorts of domain specific issues would otherwise be encoded in functions, and objects.
 As they'll exist, anyway, it's better to bring them out into the open.
 
+## Design principles
+
+### No keywords
+
+By assigning special meaning to certain symbols, we admit that our language is not powerful enough to express those concepts within itself.
+As such, there are no special words in Ouroboros, and the process of working out how to include those ideas makes the language more powerful.
+
+For example, there is no special notations for functions.
+It's just another form of assignment.
+
+```
+some_variable = 1;
+some_function = {
+    print "Hi";
+};
+```
+
+Another consequence of this is that loops are just another sort of statement, and so need a semicolon after them.
+
+```
+i = 0;
+while (i < 10) {
+    print i;
+    i = i + 1;
+};
+```
+
+### Don't forbid for the sake of forbidding
+
+An expression being strange, or useless, is not same as it being invalid.
+Just because *I* can't think of how it might be used, doesn't mean it can't be.
+
+As an extreme example, once upon a time, the identity function was seen as useless.
+"Why would you call a function that does nothing? Just don't call it in the first place."
+But with various functional ideas becoming more popular, the identity function starts becoming useful all over the place.
+
+### Abstract as much as possible
+
+The purpose of a programming language is to allow a programmer to describe, to a computer, what they want doing.
+By keeping things as abstract as possible, we allow programmers to use them in precisely the way they need.
+
+As another benefit, the process of abstraction may reveal unexpected similarities, which can then be exploited to provide new tools in the programmers kit.
+For example, much of functional programming comes from the recognition that we can use functions just as we would any other variable.
+
 ## Technical ideas
 
 Some technical ideas of language features to come:
