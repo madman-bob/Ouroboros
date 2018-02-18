@@ -77,6 +77,55 @@ This is similar to the Javascript idea of "isomorphic code".
 Further, there is no need to restrict ourselves to a client-server relationship.
 We could write code for an arbitrary number of components, as though they were all on the same machine.
 
+### Pass arguments into a function when you can
+
+Currying allows you to give some arguments of a function now, and some of them later.
+You can use this to create a collection of similar functions, by passing in some sort of configuration argument.
+
+For example:
+
+```
+wrap_tag = tag_name => contents => {
+    return "<" + tag_name + ">" + contents + "</" + tag_name + ">";
+};
+
+wrap_js = wrap_tag("script");
+wrap_css = wrap_tag("style");
+
+print(wrap_js("console.log('Hello, console')"));
+print(wrap_js("document.body.innerText = 'Hello, world'"));
+print(wrap_css("body { background-color: blue }"));
+```
+
+prints
+
+```
+<script>console.log('Hello, console')</script>
+<script>document.body.innerText = 'Hello, world'</script>
+<style>body { background-color: blue }</style>
+```
+
+This code defines the `wrap_js` and `wrap_css` functions by passing one of the arguments to `wrap_tag`, and allowing the others to be passed in later.
+Then you can use these functions, instead of repeatedly writing `wrap_tag("script", ...)`.
+
+The above is equivalent to
+
+```
+wrap_tag = (tag_name, content) => {
+    return "<" + tag_name + ">" + contents + "</" + tag_name + ">";
+};
+
+wrap_js = content => {
+    return wrap_tag("script", content);
+};
+wrap_css = content => {
+    return wrap_tag("style", content);
+};
+```
+
+but with less boilerplate, and more robust.
+If you want to extend `wrap_tag` to take more arguments, then the curried form allows you to do so easily, while the non-curried form requires you update both `wrap_js`, and `wrap_css` as well.
+
 ## Technical ideas
 
 Some technical ideas of language features to come:
