@@ -79,6 +79,13 @@ class FunctionExpression(Expression):
 operator_ordering.insert_after(ConstantExpression, FunctionExpression)
 
 
+class PrefixExpression(FunctionExpression):
+    right_associative = True
+
+
+operator_ordering.insert_before(FunctionExpression, PrefixExpression)
+
+
 class BinaryExpression(Expression):
     consumes_previous = True
     consumes_next = True
