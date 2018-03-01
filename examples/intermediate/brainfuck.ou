@@ -21,7 +21,7 @@ tape_cons = left => (right => (choice => {
     if (nil == right) {
         return 0;
     };
-    return(car right);
+    return car right;
 }));
 
 l_shift = tape => {
@@ -29,9 +29,9 @@ l_shift = tape => {
     right = tape 1;
 
     if (nil == left) {
-        return(tape_cons nil (cons 0 right));
+        return tape_cons nil (cons 0 right);
     };
-    return(tape_cons(cdr left)(cons(car left)(right)));
+    return tape_cons(cdr left)(cons(car left)(right));
 };
 
 r_shift = tape => {
@@ -39,9 +39,9 @@ r_shift = tape => {
     right = tape 1;
 
     if (nil == right) {
-        return(tape_cons (cons 0 left) nil);
+        return tape_cons (cons 0 left) nil;
     };
-    return(tape_cons(cons(car right)(left))(cdr right));
+    return tape_cons(cons(car right)(left))(cdr right);
 };
 
 head = tape => (tape 2);
@@ -50,9 +50,9 @@ set = tape => (value => {
     right = tape 1;
 
     if (nil == right) {
-        return(tape_cons left (cons value nil));
+        return tape_cons left (cons value nil);
     };
-    return(tape_cons left (cons value (cdr right)));
+    return tape_cons left (cons value (cdr right));
 });
 
 brainfuck = memory => (command_history => (skipping_depth => (command => {
@@ -60,10 +60,10 @@ brainfuck = memory => (command_history => (skipping_depth => (command => {
 
     if (skipping_depth > 0) {
         if (command == "[") {
-            return(brainfuck memory new_command_history (skipping_depth + 1));
+            return brainfuck memory new_command_history (skipping_depth + 1);
         };
         if (command == "]") {
-            return(brainfuck memory new_command_history (skipping_depth - 1));
+            return brainfuck memory new_command_history (skipping_depth - 1);
         };
     };
 
@@ -72,12 +72,12 @@ brainfuck = memory => (command_history => (skipping_depth => (command => {
         previous_command_history = cdr command_history;
 
         if (previous_command == "[") {
-            return(brainfuck memory previous_command_history (skipping_depth + 1) previous_command command);
+            return brainfuck memory previous_command_history (skipping_depth + 1) previous_command command;
         };
         if (previous_command == "]") {
-            return(brainfuck memory previous_command_history (skipping_depth - 1) previous_command command);
+            return brainfuck memory previous_command_history (skipping_depth - 1) previous_command command;
         };
-        return(brainfuck memory previous_command_history skipping_depth previous_command command);
+        return brainfuck memory previous_command_history skipping_depth previous_command command;
     };
 
     if (command == ".") {
@@ -85,34 +85,34 @@ brainfuck = memory => (command_history => (skipping_depth => (command => {
     };
 
     if (command == ">") {
-        return(brainfuck(r_shift memory) new_command_history skipping_depth);
+        return brainfuck(r_shift memory) new_command_history skipping_depth;
     };
 
     if (command == "<") {
-        return(brainfuck(l_shift memory) new_command_history skipping_depth);
+        return brainfuck(l_shift memory) new_command_history skipping_depth;
     };
 
     if (command == "+") {
-        return(brainfuck(set memory (head memory + 1)) new_command_history skipping_depth);
+        return brainfuck(set memory (head memory + 1)) new_command_history skipping_depth;
     };
 
     if (command == "-") {
-        return(brainfuck(set memory (head memory - 1)) new_command_history skipping_depth);
+        return brainfuck(set memory (head memory - 1)) new_command_history skipping_depth;
     };
 
     if (command == "[") {
         if (head memory == 0) {
-            return(brainfuck memory new_command_history (skipping_depth + 1));
+            return brainfuck memory new_command_history (skipping_depth + 1);
         };
     };
 
     if (command == "]") {
         if (head memory != 0) {
-            return(brainfuck memory command_history (skipping_depth - 1) command);
+            return brainfuck memory command_history (skipping_depth - 1) command;
         };
     };
 
-    return(brainfuck memory new_command_history skipping_depth);
+    return brainfuck memory new_command_history skipping_depth;
 })));
 
 Brainfuck = brainfuck (tape_cons nil nil) nil 0;

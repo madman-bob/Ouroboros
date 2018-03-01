@@ -8,11 +8,13 @@ operator_ordering = Ordering()
 
 
 class Expression:
+    right_associative = False
+
     @cached_class_property
     def precedence(cls):
         if cls is Expression:
             raise NotImplementedError()
-        return Precedence(operator_ordering[cls])
+        return Precedence(operator_ordering[cls], right_associative=cls.right_associative)
 
     consumes_previous = False
     consumes_next = False

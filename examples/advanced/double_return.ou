@@ -1,13 +1,13 @@
 return_if_small = potential_return_value => {
     if (potential_return_value < 2) {
-        return(return potential_return_value);
+        return return potential_return_value;
     };
 };
 
 fibonnaci = n => {
     return_if_small n;
 
-    return(fibonnaci(n - 1) + fibonnaci(n - 2));
+    return fibonnaci(n - 1) + fibonnaci(n - 2);
 };
 
 print(fibonnaci 10);
