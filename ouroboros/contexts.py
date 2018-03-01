@@ -5,7 +5,7 @@ from namedlist import namedtuple
 from ouroboros.context_base import ContextBase, ContextSwitch
 from ouroboros.sentences import Sentence, Identifier, IntToken, eval_sentence
 from ouroboros.scope import Scope
-from ouroboros.expressions import Expression
+from ouroboros.expressions import try_get_operator, unwrap_operator, Expression
 from ouroboros.operators import Operator
 from ouroboros.default_operators import ConstantExpression, Variable, FunctionExpression
 from ouroboros.utils import cached_class_property
@@ -68,7 +68,7 @@ class StringContext(ContextBase, namedtuple('StringContext', ['value'])):
 
 @eval_sentence.register(StatementContext)
 def _(sentence: StatementContext, scope: Scope) -> object:
-    expressions = [get_expression(token, scope) for token in sentence.terms if not isinstance(token, CommentContext)]
+    expressions = [try_get_operator(get_expression(token, scope)) for token in sentence.terms if not isinstance(token, CommentContext)]
 
     if not expressions:
         return ()
@@ -115,8 +115,8 @@ def _(sentence: Identifier, scope: Scope) -> Expression:
     if sentence in scope:
         value = eval_sentence(sentence, scope)
 
-        if isinstance(value, Expression):
-            return Variable(sentence, scope, precedence=value.precedence)
+        if isinstance(value, (Expression, Operator)):
+            return Variable(sentence, scope, precedence=unwrap_operator(value).precedence)
 
     return Variable(sentence, scope)
 

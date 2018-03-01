@@ -2,14 +2,10 @@ from functools import wraps
 
 from toolz import curry
 
-from ordering import Ordering
-
 from ouroboros.sentences import Sentence, Identifier, eval_sentence
 from ouroboros.scope import Scope
 from ouroboros.operators import Precedence
-from ouroboros.expressions import Expression
-
-operator_ordering = Ordering()
+from ouroboros.expressions import operator_ordering, Expression, eval_expression
 
 
 class ConstantExpression(Expression):
@@ -17,7 +13,8 @@ class ConstantExpression(Expression):
         self.sentence = sentence
         self.scope = scope
 
-        super().__init__(Precedence(operator_ordering[ConstantExpression]), lambda: eval_sentence(self.sentence, self.scope))
+    def __call__(self):
+        return eval_sentence(self.sentence, self.scope)
 
 
 operator_ordering.insert_start(ConstantExpression)
@@ -27,32 +24,36 @@ class Variable(Expression):
     def __init__(self, sentence: Sentence, scope: Scope, precedence=None):
         self.identifier = sentence
         self.scope = scope
+        self.precedence = precedence or Precedence(operator_ordering[ConstantExpression])
 
-        super().__init__(precedence or Precedence(operator_ordering[ConstantExpression]), lambda: self.scope[sentence])
+    def __call__(self):
+        return self.scope[self.identifier]
 
 
 class FunctionExpression(Expression):
+    consumes_next = True
+
     def __init__(self, block, scope: Scope, arg_name: Identifier = None):
         self.block = block
         self.scope = scope
         self.arg_name = arg_name
 
-        super().__init__(Precedence(operator_ordering[FunctionExpression]), self.__call__, consumes_next=True)
-
     @classmethod
     def from_python_function(cls, func):
         return cls(func, {}, Identifier(''))
 
-    def eval(self):
-        return self
-
-    def __call__(self, arg):
+    def __call__(self, *args):
         from ouroboros.contexts import BlockContext
+
+        if not args:
+            return self
+
+        arg = args[0]
 
         inner_scope = Scope(parent_scope=self.scope)
 
         if self.arg_name:
-            inner_scope.define(self.arg_name, arg.eval() if isinstance(arg, Expression) else arg)
+            inner_scope.define(self.arg_name, eval_expression(arg))
 
         if isinstance(self.block, (ConstantExpression, Variable, FunctionExpression)):
             self.block.scope = inner_scope
@@ -60,7 +61,7 @@ class FunctionExpression(Expression):
         if isinstance(self.block, BlockContext):
             value = eval_sentence(self.block, inner_scope).block(())
         elif isinstance(self.block, Expression):
-            value = self.block.eval()
+            value = eval_expression(self.block)
         elif isinstance(self.block, Sentence):
             value = eval_sentence(self.block, inner_scope)
         else:
@@ -79,8 +80,12 @@ operator_ordering.insert_after(ConstantExpression, FunctionExpression)
 
 
 class BinaryExpression(Expression):
+    consumes_previous = True
+    consumes_next = True
+
     def __init__(self, func, precedence=None):
-        super().__init__(precedence or Precedence(operator_ordering[BinaryExpression]), func, consumes_previous=True, consumes_next=True)
+        self.func = func
+        self.precedence = precedence or Precedence(operator_ordering[BinaryExpression])
 
     @curry
     def insert_before(self, func, right_associative=False):
@@ -99,9 +104,7 @@ class BinaryExpression(Expression):
     def ouroboros_bin_op_from_python_bin_op(cls, func):
         @wraps(func)
         def bin_op(left_expression, right_expression):
-            left_value = left_expression.eval() if isinstance(left_expression, Expression) else left_expression
-            right_value = right_expression.eval() if isinstance(right_expression, Expression) else right_expression
-            return func(left_value, right_value)
+            return func(eval_expression(left_expression), eval_expression(right_expression))
 
         return bin_op
 

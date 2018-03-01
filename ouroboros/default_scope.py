@@ -4,7 +4,7 @@ from toolz import curry
 
 from ouroboros.scope import Scope
 from ouroboros.sentences import Identifier
-from ouroboros.expressions import Expression
+from ouroboros.expressions import Expression, eval_expression
 from ouroboros.contexts import BlockContext
 from ouroboros.default_operators import Variable, FunctionExpression, BinaryExpression
 
@@ -24,7 +24,7 @@ in_default_scope("false", False)
 @in_default_scope("print")
 @FunctionExpression.from_python_function
 def inner_print(expression: Expression):
-    print(expression.eval())
+    print(eval_expression(expression))
 
 
 @in_default_scope("=")
@@ -34,7 +34,7 @@ def assign(left_expression: Expression, right_expression: Expression):
     if not isinstance(left_expression, Variable):
         raise TypeError("Trying to assign to non-variable")
 
-    assignment_value = right_expression.eval() if isinstance(right_expression, Expression) else right_expression
+    assignment_value = eval_expression(right_expression)
     if left_expression.identifier in left_expression.scope:
         left_expression.scope[left_expression.identifier] = assignment_value
     else:
@@ -65,15 +65,15 @@ ou_and = in_default_scope("and", ou_eq.insert_before(BinaryExpression.ouroboros_
 ou_xor = in_default_scope("xor", ou_and.insert_before(BinaryExpression.ouroboros_bin_op_from_python_bin_op(xor)))
 ou_or = in_default_scope("or", ou_and.insert_before(BinaryExpression.ouroboros_bin_op_from_python_bin_op(or_)))
 
-ou_not = in_default_scope("not", FunctionExpression.from_python_function(lambda a: not a.eval()))
+ou_not = in_default_scope("not", FunctionExpression.from_python_function(lambda a: not eval_expression(a)))
 
 
 @in_default_scope("if")
 @FunctionExpression.from_python_function
 @curry
 def if_statement(condition: Expression, body: Expression):
-    if condition.eval():
-        result = body.eval()(())
+    if eval_expression(condition):
+        result = eval_expression(body)(())
         if result is not None:
             return ReturnType(result)
 
@@ -82,8 +82,8 @@ def if_statement(condition: Expression, body: Expression):
 @FunctionExpression.from_python_function
 @curry
 def while_loop(condition: Expression, body: Expression):
-    while condition.eval():
-        result = body.eval()(())
+    while eval_expression(condition):
+        result = eval_expression(body)(())
         if result is not None:
             return ReturnType(result)
 
@@ -96,7 +96,7 @@ class ReturnType:
 @in_default_scope("return")
 @FunctionExpression.from_python_function
 def return_function(return_value: Expression):
-    return ReturnType(return_value.eval())
+    return ReturnType(eval_expression(return_value))
 
 
 @in_default_scope("=>")
