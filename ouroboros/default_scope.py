@@ -6,7 +6,7 @@ from ouroboros.scope import Scope
 from ouroboros.sentences import Identifier
 from ouroboros.expressions import Expression, eval_expression
 from ouroboros.contexts import BlockContext
-from ouroboros.default_operators import Variable, FunctionExpression, BinaryExpression
+from ouroboros.default_operators import Variable, FunctionExpression, PrefixExpression, BinaryExpression
 
 default_scope = Scope()
 
@@ -94,7 +94,7 @@ class ReturnType:
 
 
 @in_default_scope("return")
-@FunctionExpression.from_python_function
+@PrefixExpression.from_python_function
 def return_function(return_value: Expression):
     return ReturnType(eval_expression(return_value))
 
