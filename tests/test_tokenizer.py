@@ -28,7 +28,7 @@ class TestTokenizer(TestCase):
             ]
         )
 
-    def test_special_pretokens(self):
+    def test_special_tokens(self):
         self.assertEqual(
             list(Tokenizer(
                 """
@@ -41,7 +41,7 @@ class TestTokenizer(TestCase):
             ["(", "multiple", ")", "tokens", "only-one-token"]
         )
 
-    def test_multi_character_special_pretokens(self):
+    def test_multi_character_special_tokens(self):
         self.assertEqual(
             list(Tokenizer(
                 """
@@ -53,7 +53,7 @@ class TestTokenizer(TestCase):
             ["/*", "Multiline", "comment", "*/"]
         )
 
-    def test_end_pretokens(self):
+    def test_end_tokens(self):
         self.assertEqual(
             list(Tokenizer(
                 """
