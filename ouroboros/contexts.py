@@ -12,6 +12,8 @@ from ouroboros.utils import cached_class_property
 
 
 class StatementContext(ContextBase, namedtuple('StatementContext', ['terms'])):
+    special_tokens = (".",)
+
     @cached_class_property
     def context_switches(cls):
         return (
