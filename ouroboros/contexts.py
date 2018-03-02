@@ -6,6 +6,7 @@ from ouroboros.context_base import ContextBase, ContextSwitch
 from ouroboros.sentences import Sentence, Identifier, IntToken, eval_sentence
 from ouroboros.scope import Scope
 from ouroboros.expressions import try_get_operator, unwrap_operator, Expression
+from ouroboros.internal_types import ReturnType
 from ouroboros.operators import Operator
 from ouroboros.default_operators import ConstantExpression, Variable, FunctionExpression
 from ouroboros.utils import cached_class_property
@@ -82,7 +83,6 @@ def _(sentence: StatementContext, scope: Scope) -> object:
 def _(sentence: BlockContext, scope: Scope) -> object:
     @FunctionExpression.from_python_function
     def call(arg: Expression):
-        from ouroboros.default_scope import ReturnType
         for subcontext in sentence.statements:
             result = eval_sentence(subcontext, scope)
             if isinstance(result, ReturnType):

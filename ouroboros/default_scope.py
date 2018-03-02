@@ -6,6 +6,7 @@ from toolz import curry
 from ouroboros.scope import Scope
 from ouroboros.sentences import Identifier
 from ouroboros.expressions import Expression, eval_expression
+from ouroboros.internal_types import ReturnType, ObjectType
 from ouroboros.contexts import BlockContext
 from ouroboros.default_operators import Variable, FunctionExpression, PrefixExpression, BinaryExpression
 
@@ -89,11 +90,6 @@ def while_loop(condition: Expression, body: Expression):
             return ReturnType(result)
 
 
-class ReturnType:
-    def __init__(self, return_value):
-        self.return_value = return_value
-
-
 @in_default_scope("return")
 @PrefixExpression.from_python_function
 def return_function(return_value: Expression):
@@ -106,14 +102,6 @@ def function(argument_name: Expression, body: Expression):
     if isinstance(body, FunctionExpression) and isinstance(body.block, BlockContext) and body.arg_name is None:
         return FunctionExpression(body.block, argument_name.scope, argument_name.identifier)
     return FunctionExpression(body, argument_name.scope, argument_name.identifier)
-
-
-class ObjectType:
-    def __init__(self, attributes):
-        self.attributes = attributes
-
-    def __str__(self):
-        return str(self.attributes)
 
 
 @in_default_scope("Object")
