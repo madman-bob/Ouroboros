@@ -12,6 +12,8 @@ from ouroboros.utils import cached_class_property
 
 
 class StatementContext(ContextBase, namedtuple('StatementContext', ['terms'])):
+    special_tokens = (".",)
+
     @cached_class_property
     def context_switches(cls):
         return (
@@ -81,9 +83,8 @@ def _(sentence: BlockContext, scope: Scope) -> object:
     @FunctionExpression.from_python_function
     def call(arg: Expression):
         from ouroboros.default_scope import ReturnType
-        inner_scope = Scope(parent_scope=scope)
         for subcontext in sentence.statements:
-            result = eval_sentence(subcontext, inner_scope)
+            result = eval_sentence(subcontext, scope)
             if isinstance(result, ReturnType):
                 return result.return_value
 

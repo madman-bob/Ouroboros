@@ -42,7 +42,7 @@ class FunctionExpression(Expression):
     def from_python_function(cls, func):
         return cls(func, {}, Identifier(''))
 
-    def __call__(self, *args):
+    def __call__(self, *args, return_scope=False):
         from ouroboros.contexts import BlockContext
 
         if not args:
@@ -66,6 +66,9 @@ class FunctionExpression(Expression):
             value = eval_sentence(self.block, inner_scope)
         else:
             value = self.block(arg)
+
+        if return_scope:
+            return inner_scope
 
         if callable(value) and not isinstance(value, Expression):
             return FunctionExpression.from_python_function(value)

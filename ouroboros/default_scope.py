@@ -1,4 +1,5 @@
 from operator import add, sub, mul, truediv, pow, mod, is_, eq, ne, lt, le, gt, ge, and_, or_, xor
+from functools import partial
 
 from toolz import curry
 
@@ -105,3 +106,23 @@ def function(argument_name: Expression, body: Expression):
     if isinstance(body, FunctionExpression) and isinstance(body.block, BlockContext) and body.arg_name is None:
         return FunctionExpression(body.block, argument_name.scope, argument_name.identifier)
     return FunctionExpression(body, argument_name.scope, argument_name.identifier)
+
+
+class ObjectType:
+    def __init__(self, attributes):
+        self.attributes = attributes
+
+    def __str__(self):
+        return str(self.attributes)
+
+
+@in_default_scope("Object")
+@PrefixExpression.from_python_function
+def object_function(function):
+    return ObjectType(function((), return_scope=True))
+
+
+@in_default_scope(".")
+@partial(BinaryExpression, precedence=FunctionExpression.precedence)
+def get_attribute(object, attribute):
+    return eval_expression(object).attributes[attribute.identifier]
