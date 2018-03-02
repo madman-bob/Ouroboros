@@ -1,0 +1,35 @@
+Position = x => y => (Object {
+    move = dx => dy => {
+        x = x + dx;
+        y = y + dy;
+    };
+});
+
+player_position = Position 0 0;
+
+print[player_position.x, player_position.y];
+
+player_position.move 1 10;
+
+print[player_position.x, player_position.y];
+
+
+Entity = position => max_health => (Object {
+    health = max_health;
+
+    take_damage = damage => {
+        health = health - damage;
+        if (health < 0) {
+            health = 0;
+        };
+    };
+});
+
+player = Entity player_position 100;
+
+print[player.position.x, player.position.y, player.health];
+
+player.take_damage 75;
+player.position.move 1 (0 - 10);
+
+print[player.position.x, player.position.y, player.health];
