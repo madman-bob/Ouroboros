@@ -78,7 +78,7 @@ class TestFunctions(TestCase):
                 };
                 
                 return [fib 1, fib 2, fib 3, fib 4, fib 5, fib 6];
-            """),
+            """).list,
             [1, 1, 2, 3, 5, 8]
         )
 
@@ -93,6 +93,6 @@ class TestFunctions(TestCase):
                 });
                 
                 return [fib 1, fib 2, fib 3, fib 4, fib 5, fib 6];
-            """),
+            """).list,
             [1, 1, 2, 3, 5, 8]
         )
