@@ -2,16 +2,17 @@ from abc import ABCMeta
 
 from more_itertools import peekable
 
+from namedlist import namedtuple
+
 from ouroboros.sentences import Sentence
 from ouroboros.utils import cached_class_property
 
-
-class ContextSwitch:
-    def __init__(self, start_token, end_token, context_class, allow_implicit_end=False):
-        self.start_token = start_token
-        self.end_token = end_token
-        self.context_class = context_class
-        self.allow_implicit_end = allow_implicit_end
+ContextSwitch = namedtuple('ContextSwitch', [
+    'start_token',
+    'end_token',
+    'context_class',
+    ('allow_implicit_end', False),
+])
 
 
 class Tokenizer:
