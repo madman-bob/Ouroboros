@@ -35,6 +35,9 @@ class StatementContext(ContextBase, namedtuple('StatementContext', ['terms'])):
         else:
             return Identifier(token)
 
+    def __bool__(self):
+        return bool(self.terms)
+
 
 class BlockContext(ContextBase, namedtuple('BlockContext', ['statements'])):
     @cached_class_property
