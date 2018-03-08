@@ -86,7 +86,9 @@ class ContextBase(Sentence, metaclass=ABCMeta):
                 yield token
             else:
                 context_switch = cls.context_switches_lookup[token]
-                new_context_end_tokens = (context_switch.end_token,)
+                new_context_end_tokens = ()
+                if context_switch.end_token is not None:
+                    new_context_end_tokens += (context_switch.end_token,)
                 if context_switch.allow_implicit_end:
                     new_context_end_tokens += end_tokens
 
