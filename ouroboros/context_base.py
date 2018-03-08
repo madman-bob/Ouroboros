@@ -2,16 +2,18 @@ from abc import ABCMeta
 
 from more_itertools import peekable
 
+from namedlist import namedtuple
+
 from ouroboros.sentences import Sentence
 from ouroboros.utils import cached_class_property
 
-
-class ContextSwitch:
-    def __init__(self, start_token, end_token, context_class, allow_implicit_end=False):
-        self.start_token = start_token
-        self.end_token = end_token
-        self.context_class = context_class
-        self.allow_implicit_end = allow_implicit_end
+ContextSwitch = namedtuple('ContextSwitch', [
+    'start_token',
+    'end_token',
+    'context_class',
+    ('allow_implicit_end', False),
+    ('start_token_is_special', True),
+])
 
 
 class Tokenizer:
@@ -75,7 +77,7 @@ class ContextBase(Sentence, metaclass=ABCMeta):
         tokenizer = Tokenizer(
             iterable=iterable,
             whitespace=cls.whitespace,
-            special_tokens=cls.special_tokens + tuple(cls.context_switches_lookup),
+            special_tokens=cls.special_tokens + tuple(context_switch.start_token for context_switch in cls.context_switches if context_switch.start_token_is_special),
             end_tokens=end_tokens
         )
 
@@ -84,7 +86,9 @@ class ContextBase(Sentence, metaclass=ABCMeta):
                 yield token
             else:
                 context_switch = cls.context_switches_lookup[token]
-                new_context_end_tokens = (context_switch.end_token,)
+                new_context_end_tokens = ()
+                if context_switch.end_token is not None:
+                    new_context_end_tokens += (context_switch.end_token,)
                 if context_switch.allow_implicit_end:
                     new_context_end_tokens += end_tokens
 
