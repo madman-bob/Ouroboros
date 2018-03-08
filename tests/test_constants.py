@@ -3,6 +3,7 @@ from string import ascii_letters
 from unittest import TestCase
 
 from ouroboros import ouroboros_eval
+from ouroboros.internal_types import ListType
 
 
 class TestConstants(TestCase):
@@ -19,4 +20,6 @@ class TestConstants(TestCase):
                 self.assertEqual(ouroboros_eval('"{}"'.format(s)), s)
 
     def test_list(self):
-        self.assertEqual(ouroboros_eval('[1, 2, 3]'), [1, 2, 3])
+        result = ouroboros_eval('[1, 2, 3]')
+        self.assertIsInstance(result, ListType)
+        self.assertEqual(result.list, [1, 2, 3])

@@ -6,7 +6,7 @@ from ouroboros.context_base import ContextBase, ContextSwitch
 from ouroboros.sentences import Sentence, Identifier, IntToken, eval_sentence
 from ouroboros.scope import Scope
 from ouroboros.expressions import try_get_operator, unwrap_operator, Expression
-from ouroboros.internal_types import ReturnType
+from ouroboros.internal_types import ReturnType, ListType
 from ouroboros.operators import Operator
 from ouroboros.default_operators import ConstantExpression, Variable, FunctionExpression
 from ouroboros.utils import cached_class_property
@@ -96,7 +96,7 @@ def _(sentence: BlockContext, scope: Scope) -> object:
 
 @eval_sentence.register(ListContext)
 def _(sentence: ListContext, scope: Scope) -> object:
-    return [eval_sentence(statement, scope) for statement in sentence.values]
+    return ListType([eval_sentence(statement, scope) for statement in sentence.values if statement])
 
 
 @eval_sentence.register(CommentContext)
