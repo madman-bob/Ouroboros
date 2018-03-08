@@ -12,6 +12,7 @@ ContextSwitch = namedtuple('ContextSwitch', [
     'end_token',
     'context_class',
     ('allow_implicit_end', False),
+    ('start_token_is_special', True),
 ])
 
 
@@ -76,7 +77,7 @@ class ContextBase(Sentence, metaclass=ABCMeta):
         tokenizer = Tokenizer(
             iterable=iterable,
             whitespace=cls.whitespace,
-            special_tokens=cls.special_tokens + tuple(cls.context_switches_lookup),
+            special_tokens=cls.special_tokens + tuple(context_switch.start_token for context_switch in cls.context_switches if context_switch.start_token_is_special),
             end_tokens=end_tokens
         )
 
