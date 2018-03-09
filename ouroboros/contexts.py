@@ -24,6 +24,7 @@ class StatementContext(ContextBase, namedtuple('StatementContext', ['terms'])):
             ContextSwitch("#", "\n", CommentContext),
             ContextSwitch("/*", "*/", CommentContext),
             ContextSwitch('"', '"', StringContext),
+            ContextSwitch("import", None, ImportContext, allow_implicit_end=True, start_token_is_special=False),
         )
 
     @classmethod
@@ -65,6 +66,14 @@ class CommentContext(ContextBase, namedtuple('CommentContext', ['comment_text'])
 
 
 class StringContext(ContextBase, namedtuple('StringContext', ['value'])):
+    whitespace = ()
+
+    @classmethod
+    def from_tokens(cls, tokens):
+        return cls("".join(tokens))
+
+
+class ImportContext(ContextBase, namedtuple('ImportContext', ['path'])):
     whitespace = ()
 
     @classmethod
@@ -128,6 +137,7 @@ def _(sentence: Identifier, scope: Scope) -> Expression:
 @get_expression.register(ListContext)
 @get_expression.register(StringContext)
 @get_expression.register(StatementContext)
+@get_expression.register(ImportContext)
 def _(sentence: Sentence, scope: Scope) -> Expression:
     return ConstantExpression(sentence, scope)
 
