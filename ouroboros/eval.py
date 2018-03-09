@@ -1,16 +1,36 @@
+from os import path
+
 from ouroboros.scope import Scope
-from ouroboros.sentences import eval_sentence
+from ouroboros.sentences import Identifier, eval_sentence
 from ouroboros.contexts import StatementContext, BlockContext
 from ouroboros.default_scope import default_scope
 
-__all__ = ('ouroboros_eval', 'ouroboros_exec')
+__all__ = ('ouroboros_eval', 'ouroboros_exec', 'ouroboros_import')
 
 
-def ouroboros_eval(expression_string):
-    statement, _ = StatementContext.parse(expression_string)
-    return eval_sentence(statement, Scope(parent_scope=default_scope))
+def ouroboros_interpret(interpretation_context, expression_string, **variables):
+    sentence, _ = interpretation_context.parse(expression_string)
+    return eval_sentence(sentence, Scope(
+        local_scope={Identifier(identifier): value for identifier, value in variables.items()},
+        parent_scope=default_scope
+    ))
 
 
-def ouroboros_exec(expression_string):
-    block, _ = BlockContext.parse(expression_string)
-    return eval_sentence(block, Scope(parent_scope=default_scope))(())
+def ouroboros_eval(expression_string, **variables):
+    return ouroboros_interpret(StatementContext, expression_string, **variables)
+
+
+def ouroboros_exec(expression_string, **variables):
+    return ouroboros_interpret(BlockContext, expression_string, **variables)(())
+
+
+def ouroboros_import(file_handle, **variable):
+    file_path = path.realpath(file_handle.name)
+    file_directory = path.dirname(file_path)
+
+    return ouroboros_exec(
+        file_handle.read(),
+        __path__=file_path,
+        __directory__=file_directory,
+        **variable
+    )
