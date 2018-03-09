@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from ouroboros.sentences import Identifier, IntToken
-from ouroboros.contexts import StatementContext, BlockContext, ListContext, CommentContext, StringContext
+from ouroboros.contexts import StatementContext, BlockContext, ListContext, CommentContext, StringContext, ImportContext
 
 
 class TestParsing(TestCase):
@@ -106,3 +106,19 @@ class TestParsing(TestCase):
                         StringContext(value=string)
                     ])
                 )
+
+    def test_import_parsing(self):
+        block, _ = BlockContext.parse("""
+            x = import some_path;
+        """)
+        self.assertEqual(
+            block,
+            BlockContext(statements=[
+                StatementContext(terms=[
+                    Identifier("x"),
+                    Identifier("="),
+                    ImportContext(path="some_path")
+                ]),
+                StatementContext(terms=[])
+            ])
+        )
