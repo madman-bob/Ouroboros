@@ -67,11 +67,11 @@ class FunctionExpression(Expression):
         else:
             value = self.block(arg)
 
-        if return_scope:
-            return inner_scope
-
         if callable(value) and not isinstance(value, Expression):
-            return FunctionExpression.from_python_function(value)
+            value = FunctionExpression.from_python_function(value)
+
+        if return_scope:
+            return value, inner_scope
 
         return value
 
