@@ -1,3 +1,5 @@
+from os import path
+
 from ouroboros.scope import Scope
 from ouroboros.sentences import Identifier, eval_sentence
 from ouroboros.contexts import StatementContext, BlockContext
@@ -23,4 +25,12 @@ def ouroboros_exec(expression_string, **variables):
 
 
 def ouroboros_import(file_handle, **variable):
-    return ouroboros_exec(file_handle.read(), **variable)
+    file_path = path.realpath(file_handle.name)
+    file_directory = path.dirname(file_path)
+
+    return ouroboros_exec(
+        file_handle.read(),
+        __path__=file_path,
+        __directory__=file_directory,
+        **variable
+    )
