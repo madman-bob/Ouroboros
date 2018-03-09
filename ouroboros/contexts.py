@@ -24,6 +24,7 @@ class StatementContext(ContextBase, namedtuple('StatementContext', ['terms'])):
             ContextSwitch("#", "\n", CommentContext),
             ContextSwitch("/*", "*/", CommentContext),
             ContextSwitch('"', '"', StringContext),
+            ContextSwitch("import", None, ImportContext, allow_implicit_end=True, start_token_is_special=False),
         )
 
     @classmethod
@@ -72,6 +73,14 @@ class StringContext(ContextBase, namedtuple('StringContext', ['value'])):
         return cls("".join(tokens))
 
 
+class ImportContext(ContextBase, namedtuple('ImportContext', ['path'])):
+    whitespace = ()
+
+    @classmethod
+    def from_tokens(cls, tokens):
+        return cls("".join(tokens))
+
+
 @eval_sentence.register(StatementContext)
 def _(sentence: StatementContext, scope: Scope) -> object:
     expressions = [try_get_operator(get_expression(token, scope)) for token in sentence.terms if not isinstance(token, CommentContext)]
@@ -84,14 +93,13 @@ def _(sentence: StatementContext, scope: Scope) -> object:
 
 @eval_sentence.register(BlockContext)
 def _(sentence: BlockContext, scope: Scope) -> object:
-    @FunctionExpression.from_python_function
     def call(arg: Expression):
         for subcontext in sentence.statements:
             result = eval_sentence(subcontext, scope)
             if isinstance(result, ReturnType):
                 return result.return_value
 
-    return call
+    return FunctionExpression(call, scope, Identifier(''))
 
 
 @eval_sentence.register(ListContext)
@@ -129,6 +137,7 @@ def _(sentence: Identifier, scope: Scope) -> Expression:
 @get_expression.register(ListContext)
 @get_expression.register(StringContext)
 @get_expression.register(StatementContext)
+@get_expression.register(ImportContext)
 def _(sentence: Sentence, scope: Scope) -> Expression:
     return ConstantExpression(sentence, scope)
 

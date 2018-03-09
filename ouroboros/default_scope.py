@@ -107,7 +107,7 @@ def function(argument_name: Expression, body: Expression):
 @in_default_scope("Object")
 @PrefixExpression.from_python_function
 def object_function(function):
-    return ObjectType(function((), return_scope=True))
+    return ObjectType(function((), return_scope=True)[1])
 
 
 @in_default_scope(".")
