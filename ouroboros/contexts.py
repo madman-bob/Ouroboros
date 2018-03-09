@@ -84,14 +84,13 @@ def _(sentence: StatementContext, scope: Scope) -> object:
 
 @eval_sentence.register(BlockContext)
 def _(sentence: BlockContext, scope: Scope) -> object:
-    @FunctionExpression.from_python_function
     def call(arg: Expression):
         for subcontext in sentence.statements:
             result = eval_sentence(subcontext, scope)
             if isinstance(result, ReturnType):
                 return result.return_value
 
-    return call
+    return FunctionExpression(call, scope, Identifier(''))
 
 
 @eval_sentence.register(ListContext)
