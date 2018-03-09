@@ -1,0 +1,23 @@
+/*
+    This file imports import_object.ou, and import_custom.ou
+*/
+
+import_object = import import_object;
+
+/*
+    We get the variables in scope from import_object
+    Including a string, and a function
+*/
+
+print(import_object.hello);
+print(import_object.add_one(1));
+
+
+import_custom = import import_custom;
+
+/*
+    As import_custom returns a function, that's what we get here
+*/
+
+print(import_custom(1));
+

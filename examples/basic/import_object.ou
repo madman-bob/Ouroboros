@@ -1,0 +1,8 @@
+/*
+    This file imported into import.ou
+    Variables defined here are available as import_object.* in that file
+*/
+
+hello = "Hello, world";
+
+add_one = n => (n + 1);

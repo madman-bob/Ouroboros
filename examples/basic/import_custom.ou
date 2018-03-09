@@ -1,0 +1,11 @@
+/*
+    This file imported into import.ou
+    Variables defined here are not available in that file
+
+    Instead, it gets the value returned from this file
+*/
+
+hello = "This variable not exported";
+
+# This is the value exported from this file
+return n => (n + 2);
