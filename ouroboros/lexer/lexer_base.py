@@ -14,7 +14,7 @@ ContextSwitch = namedtuple('ContextSwitch', [
 ])
 
 
-class ContextBase(metaclass=ABCMeta):
+class LexerBase(metaclass=ABCMeta):
     whitespace = tuple(" \t\n")
     special_lexemes = ()
     context_switches = ()

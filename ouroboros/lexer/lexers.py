@@ -1,23 +1,23 @@
 from ouroboros.lexer.lexical_tokens import Statement, Block, ListStatement, Comment, StringStatement, ImportStatement
-from ouroboros.lexer.context_base import ContextBase, ContextSwitch
+from ouroboros.lexer.lexer_base import LexerBase, ContextSwitch
 from ouroboros.sentences import Identifier, IntToken
 from ouroboros.utils import cached_class_property
 
 
-class StatementContext(ContextBase):
+class StatementLexer(LexerBase):
     special_lexemes = (".",)
     result_class = Statement
 
     @cached_class_property
     def context_switches(cls):
         return (
-            ContextSwitch("{", "}", BlockContext),
-            ContextSwitch("(", ")", StatementContext),
-            ContextSwitch("[", "]", ListContext),
-            ContextSwitch("#", "\n", CommentContext),
-            ContextSwitch("/*", "*/", CommentContext),
-            ContextSwitch('"', '"', StringContext),
-            ContextSwitch("import", None, ImportContext, allow_implicit_end=True, start_lexeme_is_special=False),
+            ContextSwitch("{", "}", BlockLexer),
+            ContextSwitch("(", ")", StatementLexer),
+            ContextSwitch("[", "]", ListLexer),
+            ContextSwitch("#", "\n", CommentLexer),
+            ContextSwitch("/*", "*/", CommentLexer),
+            ContextSwitch('"', '"', StringLexer),
+            ContextSwitch("import", None, ImportLexer, allow_implicit_end=True, start_lexeme_is_special=False),
         )
 
     @classmethod
@@ -33,27 +33,27 @@ class StatementContext(ContextBase):
         return bool(self.terms)
 
 
-class BlockContext(ContextBase):
+class BlockLexer(LexerBase):
     result_class = Block
 
     @cached_class_property
     def context_switches(cls):
         return (
-            ContextSwitch("", ";", StatementContext, allow_implicit_end=True),
+            ContextSwitch("", ";", StatementLexer, allow_implicit_end=True),
         )
 
 
-class ListContext(ContextBase):
+class ListLexer(LexerBase):
     result_class = ListStatement
 
     @cached_class_property
     def context_switches(cls):
         return (
-            ContextSwitch("", ",", StatementContext, allow_implicit_end=True),
+            ContextSwitch("", ",", StatementLexer, allow_implicit_end=True),
         )
 
 
-class CommentContext(ContextBase):
+class CommentLexer(LexerBase):
     whitespace = ()
     result_class = Comment
 
@@ -63,7 +63,7 @@ class CommentContext(ContextBase):
         return cls.result_class(tokens[0] if tokens else "")
 
 
-class StringContext(ContextBase):
+class StringLexer(LexerBase):
     whitespace = ()
     result_class = StringStatement
 
@@ -72,7 +72,7 @@ class StringContext(ContextBase):
         return cls.result_class("".join(tokens))
 
 
-class ImportContext(ContextBase):
+class ImportLexer(LexerBase):
     whitespace = ()
     result_class = ImportStatement
 
