@@ -2,7 +2,8 @@ from os import path
 
 from ouroboros.scope import Scope
 from ouroboros.sentences import Identifier, eval_sentence
-from ouroboros.lexer.contexts import StatementContext, BlockContext, ImportContext
+from ouroboros.lexer.lexical_tokens import ImportStatement
+from ouroboros.lexer.contexts import StatementContext, BlockContext
 from ouroboros.internal_types import ObjectType
 from ouroboros.default_scope import default_scope
 
@@ -42,7 +43,7 @@ def ouroboros_import(file_handle, **variable):
     )
 
 
-@eval_sentence.register(ImportContext)
-def _(sentence: ImportContext, scope: Scope):
+@eval_sentence.register(ImportStatement)
+def _(sentence: ImportStatement, scope: Scope):
     with open(path.join(scope[Identifier("__directory__")], sentence.path + ".ou")) as import_file:
         return ouroboros_import(import_file)

@@ -7,7 +7,7 @@ from ouroboros.scope import Scope
 from ouroboros.sentences import Identifier
 from ouroboros.expressions import Expression, eval_expression
 from ouroboros.internal_types import ReturnType, ObjectType
-from ouroboros.lexer.contexts import BlockContext
+from ouroboros.lexer.lexical_tokens import Block
 from ouroboros.default_operators import Variable, FunctionExpression, PrefixExpression, BinaryExpression
 
 default_scope = Scope()
@@ -99,7 +99,7 @@ def return_function(return_value: Expression):
 @in_default_scope("=>")
 @assign.insert_after(right_associative=True)
 def function(argument_name: Expression, body: Expression):
-    if isinstance(body, FunctionExpression) and isinstance(body.block, BlockContext) and body.arg_name is None:
+    if isinstance(body, FunctionExpression) and isinstance(body.block, Block) and body.arg_name is None:
         return FunctionExpression(body.block, argument_name.scope, argument_name.identifier)
     return FunctionExpression(body, argument_name.scope, argument_name.identifier)
 

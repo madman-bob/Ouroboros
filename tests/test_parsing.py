@@ -1,7 +1,8 @@
 from unittest import TestCase
 
 from ouroboros.sentences import Identifier, IntToken
-from ouroboros.lexer.contexts import StatementContext, BlockContext, ListContext, CommentContext, StringContext, ImportContext
+from ouroboros.lexer.lexical_tokens import Statement, Block, ListStatement, Comment, StringStatement, ImportStatement
+from ouroboros.lexer.contexts import StatementContext, BlockContext
 
 
 class TestParsing(TestCase):
@@ -10,31 +11,31 @@ class TestParsing(TestCase):
 
         terms = [Identifier("Hello"), Identifier("world")]
 
-        self.assertIsInstance(statement, StatementContext)
+        self.assertIsInstance(statement, Statement)
         self.assertEqual(statement.terms, terms)
         self.assertEqual(end_token, None)
 
         self.assertEqual(
             statement,
-            StatementContext(terms)
+            Statement(terms)
         )
 
     def test_int_parsing(self):
         statement, _ = StatementContext.parse("x = 1")
         self.assertEqual(
             statement,
-            StatementContext([Identifier("x"), Identifier("="), IntToken(1)])
+            Statement([Identifier("x"), Identifier("="), IntToken(1)])
         )
 
     def test_context_switching(self):
         statement, _ = StatementContext.parse("x = 1 /* Set the variable to 1 */")
         self.assertEqual(
             statement,
-            StatementContext([
+            Statement([
                 Identifier("x"),
                 Identifier("="),
                 IntToken(1),
-                CommentContext(" Set the variable to 1 ")
+                Comment(" Set the variable to 1 ")
             ])
         )
 
@@ -42,10 +43,10 @@ class TestParsing(TestCase):
         block, _ = BlockContext.parse("x = 1; y = 2; z = 3")
         self.assertEqual(
             block,
-            BlockContext([
-                StatementContext([Identifier("x"), Identifier("="), IntToken(1)]),
-                StatementContext([Identifier("y"), Identifier("="), IntToken(2)]),
-                StatementContext([Identifier("z"), Identifier("="), IntToken(3)])
+            Block([
+                Statement([Identifier("x"), Identifier("="), IntToken(1)]),
+                Statement([Identifier("y"), Identifier("="), IntToken(2)]),
+                Statement([Identifier("z"), Identifier("="), IntToken(3)])
             ])
         )
 
@@ -53,13 +54,13 @@ class TestParsing(TestCase):
         statement, _ = StatementContext.parse("l = [1, 2, 3]")
         self.assertEqual(
             statement,
-            StatementContext([
+            Statement([
                 Identifier("l"),
                 Identifier("="),
-                ListContext([
-                    StatementContext([IntToken(1)]),
-                    StatementContext([IntToken(2)]),
-                    StatementContext([IntToken(3)])
+                ListStatement([
+                    Statement([IntToken(1)]),
+                    Statement([IntToken(2)]),
+                    Statement([IntToken(3)])
                 ])
             ])
         )
@@ -68,9 +69,9 @@ class TestParsing(TestCase):
         block, _ = BlockContext.parse("x = 1; # Set the variable to 1")
         self.assertEqual(
             block,
-            BlockContext([
-                StatementContext([Identifier("x"), Identifier("="), IntToken(1)]),
-                StatementContext([CommentContext(' Set the variable to 1')])
+            Block([
+                Statement([Identifier("x"), Identifier("="), IntToken(1)]),
+                Statement([Comment(' Set the variable to 1')])
             ])
         )
 
@@ -83,14 +84,14 @@ class TestParsing(TestCase):
         """)
         self.assertEqual(
             block,
-            BlockContext(statements=[
-                StatementContext(terms=[
-                    CommentContext(comment_text='\n                Set the variable to 1\n            '),
+            Block(statements=[
+                Statement(terms=[
+                    Comment(comment_text='\n                Set the variable to 1\n            '),
                     Identifier("x"),
                     Identifier("="),
                     IntToken(value=1)
                 ]),
-                StatementContext(terms=[])
+                Statement(terms=[])
             ])
         )
 
@@ -100,10 +101,10 @@ class TestParsing(TestCase):
                 statement, _ = StatementContext.parse('x = "{}"'.format(string))
                 self.assertEqual(
                     statement,
-                    StatementContext(terms=[
+                    Statement(terms=[
                         Identifier("x"),
                         Identifier("="),
-                        StringContext(value=string)
+                        StringStatement(value=string)
                     ])
                 )
 
@@ -113,12 +114,12 @@ class TestParsing(TestCase):
         """)
         self.assertEqual(
             block,
-            BlockContext(statements=[
-                StatementContext(terms=[
+            Block(statements=[
+                Statement(terms=[
                     Identifier("x"),
                     Identifier("="),
-                    ImportContext(path="some_path")
+                    ImportStatement(path="some_path")
                 ]),
-                StatementContext(terms=[])
+                Statement(terms=[])
             ])
         )

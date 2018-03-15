@@ -43,7 +43,7 @@ class FunctionExpression(Expression):
         return cls(func, {}, Identifier(''))
 
     def __call__(self, *args, return_scope=False):
-        from ouroboros.lexer.contexts import BlockContext
+        from ouroboros.lexer.lexical_tokens import Block
 
         if not args:
             return self
@@ -58,7 +58,7 @@ class FunctionExpression(Expression):
         if isinstance(self.block, (ConstantExpression, Variable, FunctionExpression)):
             self.block.scope = inner_scope
 
-        if isinstance(self.block, BlockContext):
+        if isinstance(self.block, Block):
             value = eval_sentence(self.block, inner_scope).block(())
         elif isinstance(self.block, Expression):
             value = eval_expression(self.block)

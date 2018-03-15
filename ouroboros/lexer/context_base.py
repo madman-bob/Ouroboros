@@ -2,7 +2,6 @@ from abc import ABCMeta
 
 from namedlist import namedtuple
 
-from ouroboros.sentences import Sentence
 from ouroboros.lexer.chunker import Chunker
 from ouroboros.utils import cached_class_property
 
@@ -15,10 +14,11 @@ ContextSwitch = namedtuple('ContextSwitch', [
 ])
 
 
-class ContextBase(Sentence, metaclass=ABCMeta):
+class ContextBase(metaclass=ABCMeta):
     whitespace = tuple(" \t\n")
     special_lexemes = ()
     context_switches = ()
+    result_class = list
 
     @cached_class_property
     def context_switches_lookup(cls):
@@ -57,7 +57,7 @@ class ContextBase(Sentence, metaclass=ABCMeta):
 
     @classmethod
     def from_tokens(cls, tokens):
-        return cls(tokens)
+        return cls.result_class(tokens)
 
     @classmethod
     def parse(cls, iterable, end_lexemes=()):

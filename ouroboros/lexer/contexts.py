@@ -1,19 +1,12 @@
-from functools import singledispatch
-
-from namedlist import namedtuple
-
+from ouroboros.lexer.lexical_tokens import Statement, Block, ListStatement, Comment, StringStatement, ImportStatement
 from ouroboros.lexer.context_base import ContextBase, ContextSwitch
-from ouroboros.sentences import Sentence, Identifier, IntToken, eval_sentence
-from ouroboros.scope import Scope
-from ouroboros.expressions import try_get_operator, unwrap_operator, Expression
-from ouroboros.internal_types import ReturnType, ListType
-from ouroboros.operators import Operator
-from ouroboros.default_operators import ConstantExpression, Variable, FunctionExpression
+from ouroboros.sentences import Identifier, IntToken
 from ouroboros.utils import cached_class_property
 
 
-class StatementContext(ContextBase, namedtuple('StatementContext', ['terms'])):
+class StatementContext(ContextBase):
     special_lexemes = (".",)
+    result_class = Statement
 
     @cached_class_property
     def context_switches(cls):
@@ -29,7 +22,7 @@ class StatementContext(ContextBase, namedtuple('StatementContext', ['terms'])):
 
     @classmethod
     def parse_token(cls, lexeme):
-        if isinstance(lexeme, ContextBase):
+        if not isinstance(lexeme, str):
             return lexeme
         elif lexeme.isdigit():
             return IntToken(int(lexeme))
@@ -40,7 +33,9 @@ class StatementContext(ContextBase, namedtuple('StatementContext', ['terms'])):
         return bool(self.terms)
 
 
-class BlockContext(ContextBase, namedtuple('BlockContext', ['statements'])):
+class BlockContext(ContextBase):
+    result_class = Block
+
     @cached_class_property
     def context_switches(cls):
         return (
@@ -48,7 +43,9 @@ class BlockContext(ContextBase, namedtuple('BlockContext', ['statements'])):
         )
 
 
-class ListContext(ContextBase, namedtuple('ListContext', ['values'])):
+class ListContext(ContextBase):
+    result_class = ListStatement
+
     @cached_class_property
     def context_switches(cls):
         return (
@@ -56,92 +53,29 @@ class ListContext(ContextBase, namedtuple('ListContext', ['values'])):
         )
 
 
-class CommentContext(ContextBase, namedtuple('CommentContext', ['comment_text'])):
+class CommentContext(ContextBase):
     whitespace = ()
+    result_class = Comment
 
     @classmethod
     def from_tokens(cls, tokens):
         assert len(tokens) <= 1
-        return cls(tokens[0] if tokens else "")
+        return cls.result_class(tokens[0] if tokens else "")
 
 
-class StringContext(ContextBase, namedtuple('StringContext', ['value'])):
+class StringContext(ContextBase):
     whitespace = ()
+    result_class = StringStatement
 
     @classmethod
     def from_tokens(cls, tokens):
-        return cls("".join(tokens))
+        return cls.result_class("".join(tokens))
 
 
-class ImportContext(ContextBase, namedtuple('ImportContext', ['path'])):
+class ImportContext(ContextBase):
     whitespace = ()
+    result_class = ImportStatement
 
     @classmethod
     def from_tokens(cls, tokens):
-        return cls("".join(tokens))
-
-
-@eval_sentence.register(StatementContext)
-def _(sentence: StatementContext, scope: Scope) -> object:
-    expressions = [try_get_operator(get_expression(token, scope)) for token in sentence.terms if not isinstance(token, CommentContext)]
-
-    if not expressions:
-        return ()
-
-    return Operator.reduce(expressions)
-
-
-@eval_sentence.register(BlockContext)
-def _(sentence: BlockContext, scope: Scope) -> object:
-    def call(arg: Expression):
-        for subcontext in sentence.statements:
-            result = eval_sentence(subcontext, scope)
-            if isinstance(result, ReturnType):
-                return result.return_value
-
-    return FunctionExpression(call, scope, Identifier(''))
-
-
-@eval_sentence.register(ListContext)
-def _(sentence: ListContext, scope: Scope) -> object:
-    return ListType([eval_sentence(statement, scope) for statement in sentence.values if statement])
-
-
-@eval_sentence.register(CommentContext)
-def _(sentence: CommentContext, scope: Scope) -> object:
-    pass
-
-
-@eval_sentence.register(StringContext)
-def _(sentence: StringContext, scope: Scope) -> object:
-    return sentence.value
-
-
-@singledispatch
-def get_expression(sentence: Sentence, scope: Scope) -> Expression:
-    raise NotImplementedError("{!r} {!r}".format(sentence, scope))
-
-
-@get_expression.register(Identifier)
-def _(sentence: Identifier, scope: Scope) -> Expression:
-    if sentence in scope:
-        value = eval_sentence(sentence, scope)
-
-        if isinstance(value, (Expression, Operator)):
-            return Variable(sentence, scope, precedence=unwrap_operator(value).precedence)
-
-    return Variable(sentence, scope)
-
-
-@get_expression.register(IntToken)
-@get_expression.register(ListContext)
-@get_expression.register(StringContext)
-@get_expression.register(StatementContext)
-@get_expression.register(ImportContext)
-def _(sentence: Sentence, scope: Scope) -> Expression:
-    return ConstantExpression(sentence, scope)
-
-
-@get_expression.register(BlockContext)
-def _(sentence: BlockContext, scope: Scope) -> Expression:
-    return FunctionExpression(sentence, scope)
+        return cls.result_class("".join(tokens))
