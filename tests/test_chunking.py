@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from ouroboros.lexer.context_base import Chunker
+from ouroboros.lexer.chunker import Chunker
 
 
 class TestChunker(TestCase):
