@@ -13,7 +13,7 @@ from ouroboros.utils import cached_class_property
 
 
 class StatementContext(ContextBase, namedtuple('StatementContext', ['terms'])):
-    special_tokens = (".",)
+    special_lexemes = (".",)
 
     @cached_class_property
     def context_switches(cls):
@@ -24,17 +24,17 @@ class StatementContext(ContextBase, namedtuple('StatementContext', ['terms'])):
             ContextSwitch("#", "\n", CommentContext),
             ContextSwitch("/*", "*/", CommentContext),
             ContextSwitch('"', '"', StringContext),
-            ContextSwitch("import", None, ImportContext, allow_implicit_end=True, start_token_is_special=False),
+            ContextSwitch("import", None, ImportContext, allow_implicit_end=True, start_lexeme_is_special=False),
         )
 
     @classmethod
-    def parse_token(cls, token):
-        if isinstance(token, ContextBase):
-            return token
-        elif token.isdigit():
-            return IntToken(int(token))
+    def parse_token(cls, lexeme):
+        if isinstance(lexeme, ContextBase):
+            return lexeme
+        elif lexeme.isdigit():
+            return IntToken(int(lexeme))
         else:
-            return Identifier(token)
+            return Identifier(lexeme)
 
     def __bool__(self):
         return bool(self.terms)

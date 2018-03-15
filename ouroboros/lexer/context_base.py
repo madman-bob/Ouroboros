@@ -7,67 +7,67 @@ from ouroboros.lexer.chunker import Chunker
 from ouroboros.utils import cached_class_property
 
 ContextSwitch = namedtuple('ContextSwitch', [
-    'start_token',
-    'end_token',
+    'start_lexeme',
+    'end_lexeme',
     'context_class',
     ('allow_implicit_end', False),
-    ('start_token_is_special', True),
+    ('start_lexeme_is_special', True),
 ])
 
 
 class ContextBase(Sentence, metaclass=ABCMeta):
     whitespace = tuple(" \t\n")
-    special_tokens = ()
+    special_lexemes = ()
     context_switches = ()
 
     @cached_class_property
     def context_switches_lookup(cls):
-        return {context_switch.start_token: context_switch for context_switch in cls.context_switches}
+        return {context_switch.start_lexeme: context_switch for context_switch in cls.context_switches}
 
     @classmethod
-    def chunk(cls, iterable, end_tokens=()):
+    def chunk(cls, iterable, end_lexemes=()):
         chunker = Chunker(
             iterable=iterable,
             whitespace=cls.whitespace,
-            special_tokens=cls.special_tokens + tuple(context_switch.start_token for context_switch in cls.context_switches if context_switch.start_token_is_special),
-            end_tokens=end_tokens
+            special_lexemes=cls.special_lexemes + tuple(context_switch.start_lexeme for context_switch in cls.context_switches if context_switch.start_lexeme_is_special),
+            end_lexemes=end_lexemes
         )
 
-        for token in chunker:
-            if token not in cls.context_switches_lookup:
-                yield token
+        for lexeme in chunker:
+            if lexeme not in cls.context_switches_lookup:
+                yield lexeme
             else:
-                context_switch = cls.context_switches_lookup[token]
-                new_context_end_tokens = ()
-                if context_switch.end_token is not None:
-                    new_context_end_tokens += (context_switch.end_token,)
+                context_switch = cls.context_switches_lookup[lexeme]
+                new_context_end_lexemes = ()
+                if context_switch.end_lexeme is not None:
+                    new_context_end_lexemes += (context_switch.end_lexeme,)
                 if context_switch.allow_implicit_end:
-                    new_context_end_tokens += end_tokens
+                    new_context_end_lexemes += end_lexemes
 
-                new_context, end_token = context_switch.context_class.parse(chunker.iterator, new_context_end_tokens)
+                new_context, end_lexeme = context_switch.context_class.parse(chunker.iterator, new_context_end_lexemes)
                 yield new_context
 
-                if context_switch.allow_implicit_end and end_token in end_tokens:
-                    yield end_token
+                if context_switch.allow_implicit_end and end_lexeme in end_lexemes:
+                    yield end_lexeme
                     return
 
     @classmethod
-    def parse_token(cls, token):
-        return token
+    def parse_token(cls, lexeme):
+        return lexeme
 
     @classmethod
     def from_tokens(cls, tokens):
         return cls(tokens)
 
     @classmethod
-    def parse(cls, iterable, end_tokens=()):
+    def parse(cls, iterable, end_lexemes=()):
         tokens = [
-            cls.parse_token(token) if token not in end_tokens else token
-            for token in cls.chunk(iterable, end_tokens)
+            cls.parse_token(lexeme) if lexeme not in end_lexemes else lexeme
+            for lexeme in cls.chunk(iterable, end_lexemes)
         ]
-        end_token = None
+        end_lexeme = None
 
-        if tokens and tokens[-1] in end_tokens:
-            end_token = tokens.pop()
+        if tokens and tokens[-1] in end_lexemes:
+            end_lexeme = tokens.pop()
 
-        return cls.from_tokens(tokens), end_token
+        return cls.from_tokens(tokens), end_lexeme

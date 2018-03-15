@@ -28,7 +28,7 @@ class TestChunker(TestCase):
             ]
         )
 
-    def test_special_tokens(self):
+    def test_special_lexemes(self):
         self.assertEqual(
             list(Chunker(
                 """
@@ -41,7 +41,7 @@ class TestChunker(TestCase):
             ["(", "multiple", ")", "tokens", "only-one-token"]
         )
 
-    def test_multi_character_special_tokens(self):
+    def test_multi_character_special_lexemes(self):
         self.assertEqual(
             list(Chunker(
                 """
@@ -53,7 +53,7 @@ class TestChunker(TestCase):
             ["/*", "Multiline", "comment", "*/"]
         )
 
-    def test_end_tokens(self):
+    def test_end_lexemes(self):
         self.assertEqual(
             list(Chunker(
                 """
@@ -61,7 +61,7 @@ class TestChunker(TestCase):
                 These tokens not reached
                 """,
                 " \n",
-                end_tokens="!"
+                end_lexemes="!"
             )),
             ["STOP", "!"]
         )

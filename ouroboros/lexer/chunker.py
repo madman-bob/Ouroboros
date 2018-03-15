@@ -2,47 +2,47 @@ from more_itertools import peekable
 
 
 class Chunker:
-    def __init__(self, iterable, whitespace, special_tokens=(), end_tokens=()):
+    def __init__(self, iterable, whitespace, special_lexemes=(), end_lexemes=()):
         self.iterator = peekable(iterable)
-        self.end_tokens = tuple(end_tokens)
+        self.end_lexemes = tuple(end_lexemes)
 
         self.whitespace = whitespace
-        self.special_tokens = special_tokens + self.end_tokens
+        self.special_lexemes = special_lexemes + self.end_lexemes
 
     def __iter__(self):
         """
-        Yields tokens generated from input iterator
+        Yields lexemes generated from input iterator
 
-        Splits tokens based on whitespace characters, and on special_tokens,
-        yielding special_tokens, but not whitespace
+        Splits lexemes based on whitespace characters, and on special_lexemes,
+        yielding special_lexemes, but not whitespace
 
-        Ends when the iterator is exhausted, or one of the end_tokens are reached
+        Ends when the iterator is exhausted, or one of the end_lexemes are reached
         """
-        if "" in self.special_tokens:
+        if "" in self.special_lexemes:
             while self.iterator:
                 yield ""
             return
 
-        token = ""
+        lexeme = ""
         for char in self.iterator:
             if char in self.whitespace:
-                if token:
-                    yield token
-                    token = ""
+                if lexeme:
+                    yield lexeme
+                    lexeme = ""
                 continue
 
-            token += char
+            lexeme += char
 
-            special_token = next((special_token for special_token in self.special_tokens if token.endswith(special_token)), None)
-            if special_token is not None:
-                if token != special_token:
-                    yield token[:len(token) - len(special_token)]
-                token = ""
+            special_lexeme = next((special_lexeme for special_lexeme in self.special_lexemes if lexeme.endswith(special_lexeme)), None)
+            if special_lexeme is not None:
+                if lexeme != special_lexeme:
+                    yield lexeme[:len(lexeme) - len(special_lexeme)]
+                lexeme = ""
 
-                yield special_token
+                yield special_lexeme
 
-            if special_token in self.end_tokens:
+            if special_lexeme in self.end_lexemes:
                 return
 
-        if token:
-            yield token
+        if lexeme:
+            yield lexeme
