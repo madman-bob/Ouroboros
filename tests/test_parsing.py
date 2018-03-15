@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from ouroboros.sentences import Identifier, IntToken
-from ouroboros.contexts import StatementContext, BlockContext, ListContext, CommentContext, StringContext, ImportContext
+from ouroboros.lexer.contexts import StatementContext, BlockContext, ListContext, CommentContext, StringContext, ImportContext
 
 
 class TestParsing(TestCase):

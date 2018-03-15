@@ -7,7 +7,7 @@ from ouroboros.scope import Scope
 from ouroboros.sentences import Identifier
 from ouroboros.expressions import Expression, eval_expression
 from ouroboros.internal_types import ReturnType, ObjectType
-from ouroboros.contexts import BlockContext
+from ouroboros.lexer.contexts import BlockContext
 from ouroboros.default_operators import Variable, FunctionExpression, PrefixExpression, BinaryExpression
 
 default_scope = Scope()

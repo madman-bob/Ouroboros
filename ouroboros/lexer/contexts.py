@@ -2,7 +2,7 @@ from functools import singledispatch
 
 from namedlist import namedtuple
 
-from ouroboros.context_base import ContextBase, ContextSwitch
+from ouroboros.lexer.context_base import ContextBase, ContextSwitch
 from ouroboros.sentences import Sentence, Identifier, IntToken, eval_sentence
 from ouroboros.scope import Scope
 from ouroboros.expressions import try_get_operator, unwrap_operator, Expression

@@ -2,7 +2,7 @@ from os import path
 
 from ouroboros.scope import Scope
 from ouroboros.sentences import Identifier, eval_sentence
-from ouroboros.contexts import StatementContext, BlockContext, ImportContext
+from ouroboros.lexer.contexts import StatementContext, BlockContext, ImportContext
 from ouroboros.internal_types import ObjectType
 from ouroboros.default_scope import default_scope
 

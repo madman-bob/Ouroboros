@@ -43,7 +43,7 @@ class FunctionExpression(Expression):
         return cls(func, {}, Identifier(''))
 
     def __call__(self, *args, return_scope=False):
-        from ouroboros.contexts import BlockContext
+        from ouroboros.lexer.contexts import BlockContext
 
         if not args:
             return self

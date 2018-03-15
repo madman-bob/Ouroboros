@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from ouroboros.context_base import Tokenizer
+from ouroboros.lexer.context_base import Tokenizer
 
 
 class TestTokenizer(TestCase):
