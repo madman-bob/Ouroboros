@@ -16,7 +16,7 @@ ContextSwitch = namedtuple('ContextSwitch', [
 ])
 
 
-class Tokenizer:
+class Chunker:
     def __init__(self, iterable, whitespace, special_tokens=(), end_tokens=()):
         self.iterator = peekable(iterable)
         self.end_tokens = tuple(end_tokens)
@@ -73,15 +73,15 @@ class ContextBase(Sentence, metaclass=ABCMeta):
         return {context_switch.start_token: context_switch for context_switch in cls.context_switches}
 
     @classmethod
-    def tokenize(cls, iterable, end_tokens=()):
-        tokenizer = Tokenizer(
+    def chunk(cls, iterable, end_tokens=()):
+        chunker = Chunker(
             iterable=iterable,
             whitespace=cls.whitespace,
             special_tokens=cls.special_tokens + tuple(context_switch.start_token for context_switch in cls.context_switches if context_switch.start_token_is_special),
             end_tokens=end_tokens
         )
 
-        for token in tokenizer:
+        for token in chunker:
             if token not in cls.context_switches_lookup:
                 yield token
             else:
@@ -92,7 +92,7 @@ class ContextBase(Sentence, metaclass=ABCMeta):
                 if context_switch.allow_implicit_end:
                     new_context_end_tokens += end_tokens
 
-                new_context, end_token = context_switch.context_class.parse(tokenizer.iterator, new_context_end_tokens)
+                new_context, end_token = context_switch.context_class.parse(chunker.iterator, new_context_end_tokens)
                 yield new_context
 
                 if context_switch.allow_implicit_end and end_token in end_tokens:
@@ -111,7 +111,7 @@ class ContextBase(Sentence, metaclass=ABCMeta):
     def parse(cls, iterable, end_tokens=()):
         tokens = [
             cls.parse_token(token) if token not in end_tokens else token
-            for token in cls.tokenize(iterable, end_tokens)
+            for token in cls.chunk(iterable, end_tokens)
         ]
         end_token = None
 

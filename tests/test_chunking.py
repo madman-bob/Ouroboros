@@ -1,18 +1,18 @@
 from unittest import TestCase
 
-from ouroboros.lexer.context_base import Tokenizer
+from ouroboros.lexer.context_base import Chunker
 
 
-class TestTokenizer(TestCase):
-    def test_basic_tokenization(self):
+class TestChunker(TestCase):
+    def test_basic_chunking(self):
         self.assertEqual(
-            list(Tokenizer("Hello world", " ")),
+            list(Chunker("Hello world", " ")),
             ["Hello", "world"]
         )
 
     def test_whitespace(self):
         self.assertEqual(
-            list(Tokenizer(
+            list(Chunker(
                 """
                     Hello world
                     Here are some more tokens
@@ -30,7 +30,7 @@ class TestTokenizer(TestCase):
 
     def test_special_tokens(self):
         self.assertEqual(
-            list(Tokenizer(
+            list(Chunker(
                 """
                     (multiple)tokens
                     only-one-token
@@ -43,7 +43,7 @@ class TestTokenizer(TestCase):
 
     def test_multi_character_special_tokens(self):
         self.assertEqual(
-            list(Tokenizer(
+            list(Chunker(
                 """
                     /*Multiline comment*/
                 """,
@@ -55,7 +55,7 @@ class TestTokenizer(TestCase):
 
     def test_end_tokens(self):
         self.assertEqual(
-            list(Tokenizer(
+            list(Chunker(
                 """
                 STOP!
                 These tokens not reached
