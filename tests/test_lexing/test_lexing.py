@@ -4,8 +4,8 @@ from ouroboros.lexer.lexical_tokens import Identifier, IntToken, Statement, Bloc
 from ouroboros.lexer.lexers import StatementLexer, BlockLexer
 
 
-class TestParsing(TestCase):
-    def test_basic_parsing(self):
+class TestLexing(TestCase):
+    def test_basic_lexing(self):
         statement, end_token = StatementLexer.parse("Hello world")
 
         terms = [Identifier("Hello"), Identifier("world")]
@@ -19,7 +19,7 @@ class TestParsing(TestCase):
             Statement(terms)
         )
 
-    def test_int_parsing(self):
+    def test_int_lexing(self):
         statement, _ = StatementLexer.parse("x = 1")
         self.assertEqual(
             statement,
@@ -38,7 +38,7 @@ class TestParsing(TestCase):
             ])
         )
 
-    def test_block_parsing(self):
+    def test_block_lexing(self):
         block, _ = BlockLexer.parse("x = 1; y = 2; z = 3")
         self.assertEqual(
             block,
@@ -49,7 +49,7 @@ class TestParsing(TestCase):
             ])
         )
 
-    def test_list_parsing(self):
+    def test_list_lexing(self):
         statement, _ = StatementLexer.parse("l = [1, 2, 3]")
         self.assertEqual(
             statement,
@@ -64,7 +64,7 @@ class TestParsing(TestCase):
             ])
         )
 
-    def test_inline_comment_parsing(self):
+    def test_inline_comment_lexing(self):
         block, _ = BlockLexer.parse("x = 1; # Set the variable to 1")
         self.assertEqual(
             block,
@@ -74,7 +74,7 @@ class TestParsing(TestCase):
             ])
         )
 
-    def test_block_comment_parsing(self):
+    def test_block_comment_lexing(self):
         block, _ = BlockLexer.parse("""
             /*
                 Set the variable to 1
@@ -94,7 +94,7 @@ class TestParsing(TestCase):
             ])
         )
 
-    def test_string_parsing(self):
+    def test_string_lexing(self):
         for string in ["Hello, world", ""]:
             with self.subTest(string=string):
                 statement, _ = StatementLexer.parse('x = "{}"'.format(string))
@@ -107,7 +107,7 @@ class TestParsing(TestCase):
                     ])
                 )
 
-    def test_import_parsing(self):
+    def test_import_lexing(self):
         block, _ = BlockLexer.parse("""
             x = import some_path;
         """)
