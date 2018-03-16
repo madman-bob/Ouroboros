@@ -2,7 +2,7 @@ from functools import wraps
 
 from toolz import curry
 
-from ouroboros.sentences import Sentence, Identifier, eval_sentence
+from ouroboros.sentences import Sentence, Identifier
 from ouroboros.scope import Scope
 from ouroboros.operators import Precedence
 from ouroboros.expressions import operator_ordering, Expression, eval_expression
@@ -14,6 +14,8 @@ class ConstantExpression(Expression):
         self.scope = scope
 
     def __call__(self):
+        from ouroboros.eval_sentence import eval_sentence
+
         return eval_sentence(self.sentence, self.scope)
 
 
@@ -44,6 +46,7 @@ class FunctionExpression(Expression):
 
     def __call__(self, *args, return_scope=False):
         from ouroboros.lexer.lexical_tokens import Block
+        from ouroboros.eval_sentence import eval_sentence
 
         if not args:
             return self

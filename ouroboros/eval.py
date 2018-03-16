@@ -1,7 +1,8 @@
 from os import path
 
 from ouroboros.scope import Scope
-from ouroboros.sentences import Identifier, eval_sentence
+from ouroboros.sentences import Identifier
+from ouroboros.eval_sentence import eval_sentence
 from ouroboros.lexer.lexical_tokens import ImportStatement
 from ouroboros.lexer.lexers import StatementLexer, BlockLexer
 from ouroboros.internal_types import ObjectType
