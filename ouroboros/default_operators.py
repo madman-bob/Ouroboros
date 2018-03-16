@@ -2,29 +2,29 @@ from functools import wraps
 
 from toolz import curry
 
-from ouroboros.lexer.lexical_tokens import Sentence, Identifier
+from ouroboros.lexer.lexical_tokens import Token, Identifier
 from ouroboros.scope import Scope
 from ouroboros.operators import Precedence
 from ouroboros.expressions import operator_ordering, Expression, eval_expression
 
 
 class ConstantExpression(Expression):
-    def __init__(self, sentence: Sentence, scope: Scope):
-        self.sentence = sentence
+    def __init__(self, token: Token, scope: Scope):
+        self.token = token
         self.scope = scope
 
     def __call__(self):
         from ouroboros.eval_sentence import eval_sentence
 
-        return eval_sentence(self.sentence, self.scope)
+        return eval_sentence(self.token, self.scope)
 
 
 operator_ordering.insert_start(ConstantExpression)
 
 
 class Variable(Expression):
-    def __init__(self, sentence: Sentence, scope: Scope, precedence=None):
-        self.identifier = sentence
+    def __init__(self, token: Token, scope: Scope, precedence=None):
+        self.identifier = token
         self.scope = scope
         self.precedence = precedence or Precedence(operator_ordering[ConstantExpression])
 
@@ -65,7 +65,7 @@ class FunctionExpression(Expression):
             value = eval_sentence(self.block, inner_scope).block(())
         elif isinstance(self.block, Expression):
             value = eval_expression(self.block)
-        elif isinstance(self.block, Sentence):
+        elif isinstance(self.block, Token):
             value = eval_sentence(self.block, inner_scope)
         else:
             value = self.block(arg)

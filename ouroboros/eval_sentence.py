@@ -1,7 +1,7 @@
 from functools import singledispatch
 
 from ouroboros.scope import Scope
-from ouroboros.lexer.lexical_tokens import Sentence, Identifier, ConstantSentence, IntToken, Statement, Block, ListStatement, Comment, StringStatement, ImportStatement
+from ouroboros.lexer.lexical_tokens import Token, Identifier, Constant, IntToken, Statement, Block, ListStatement, Comment, StringStatement, ImportStatement
 from ouroboros.expressions import try_get_operator, unwrap_operator, Expression
 from ouroboros.internal_types import ReturnType, ListType
 from ouroboros.operators import Operator
@@ -9,28 +9,28 @@ from ouroboros.default_operators import ConstantExpression, Variable, FunctionEx
 
 
 @singledispatch
-def eval_sentence(sentence: object, scope: Scope) -> object:
-    return sentence
+def eval_sentence(token: object, scope: Scope) -> object:
+    return token
 
 
-@eval_sentence.register(Sentence)
-def _(sentence: Sentence, scope: Scope) -> object:
-    raise NotImplementedError("{!r} {!r}".format(sentence, scope))
+@eval_sentence.register(Token)
+def _(token: Token, scope: Scope) -> object:
+    raise NotImplementedError("{!r} {!r}".format(token, scope))
 
 
 @eval_sentence.register(Identifier)
-def _(sentence: Identifier, scope: Scope) -> object:
-    return scope[sentence]
+def _(token: Identifier, scope: Scope) -> object:
+    return scope[token]
 
 
-@eval_sentence.register(ConstantSentence)
-def _(sentence: ConstantSentence, scope: Scope) -> object:
-    return sentence.value
+@eval_sentence.register(Constant)
+def _(token: Constant, scope: Scope) -> object:
+    return token.value
 
 
 @eval_sentence.register(Statement)
-def _(sentence: Statement, scope: Scope) -> object:
-    expressions = [try_get_operator(get_expression(token, scope)) for token in sentence.terms if not isinstance(token, Comment)]
+def _(token: Statement, scope: Scope) -> object:
+    expressions = [try_get_operator(get_expression(token, scope)) for token in token.terms if not isinstance(token, Comment)]
 
     if not expressions:
         return ()
@@ -39,9 +39,9 @@ def _(sentence: Statement, scope: Scope) -> object:
 
 
 @eval_sentence.register(Block)
-def _(sentence: Block, scope: Scope) -> object:
+def _(token: Block, scope: Scope) -> object:
     def call(arg: Expression):
-        for subcontext in sentence.statements:
+        for subcontext in token.statements:
             result = eval_sentence(subcontext, scope)
             if isinstance(result, ReturnType):
                 return result.return_value
@@ -50,34 +50,34 @@ def _(sentence: Block, scope: Scope) -> object:
 
 
 @eval_sentence.register(ListStatement)
-def _(sentence: ListStatement, scope: Scope) -> object:
-    return ListType([eval_sentence(statement, scope) for statement in sentence.values if statement])
+def _(token: ListStatement, scope: Scope) -> object:
+    return ListType([eval_sentence(statement, scope) for statement in token.values if statement])
 
 
 @eval_sentence.register(Comment)
-def _(sentence: Comment, scope: Scope) -> object:
+def _(token: Comment, scope: Scope) -> object:
     pass
 
 
 @eval_sentence.register(StringStatement)
-def _(sentence: StringStatement, scope: Scope) -> object:
-    return sentence.value
+def _(token: StringStatement, scope: Scope) -> object:
+    return token.value
 
 
 @singledispatch
-def get_expression(sentence: Sentence, scope: Scope) -> Expression:
-    raise NotImplementedError("{!r} {!r}".format(sentence, scope))
+def get_expression(token: Token, scope: Scope) -> Expression:
+    raise NotImplementedError("{!r} {!r}".format(token, scope))
 
 
 @get_expression.register(Identifier)
-def _(sentence: Identifier, scope: Scope) -> Expression:
-    if sentence in scope:
-        value = eval_sentence(sentence, scope)
+def _(token: Identifier, scope: Scope) -> Expression:
+    if token in scope:
+        value = eval_sentence(token, scope)
 
         if isinstance(value, (Expression, Operator)):
-            return Variable(sentence, scope, precedence=unwrap_operator(value).precedence)
+            return Variable(token, scope, precedence=unwrap_operator(value).precedence)
 
-    return Variable(sentence, scope)
+    return Variable(token, scope)
 
 
 @get_expression.register(IntToken)
@@ -85,10 +85,10 @@ def _(sentence: Identifier, scope: Scope) -> Expression:
 @get_expression.register(StringStatement)
 @get_expression.register(Statement)
 @get_expression.register(ImportStatement)
-def _(sentence: Sentence, scope: Scope) -> Expression:
-    return ConstantExpression(sentence, scope)
+def _(token: Token, scope: Scope) -> Expression:
+    return ConstantExpression(token, scope)
 
 
 @get_expression.register(Block)
-def _(sentence: Block, scope: Scope) -> Expression:
-    return FunctionExpression(sentence, scope)
+def _(token: Block, scope: Scope) -> Expression:
+    return FunctionExpression(token, scope)

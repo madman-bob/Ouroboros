@@ -11,8 +11,8 @@ __all__ = ('ouroboros_eval', 'ouroboros_exec', 'ouroboros_import')
 
 
 def ouroboros_interpret(interpretation_context, expression_string, **variables):
-    sentence, _ = interpretation_context.parse(expression_string)
-    return eval_sentence(sentence, Scope(
+    token, _ = interpretation_context.parse(expression_string)
+    return eval_sentence(token, Scope(
         local_scope={Identifier(identifier): value for identifier, value in variables.items()},
         parent_scope=default_scope
     ))
@@ -44,6 +44,6 @@ def ouroboros_import(file_handle, **variable):
 
 
 @eval_sentence.register(ImportStatement)
-def _(sentence: ImportStatement, scope: Scope):
-    with open(path.join(scope[Identifier("__directory__")], sentence.path + ".ou")) as import_file:
+def _(token: ImportStatement, scope: Scope):
+    with open(path.join(scope[Identifier("__directory__")], token.path + ".ou")) as import_file:
         return ouroboros_import(import_file)
