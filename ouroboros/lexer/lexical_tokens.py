@@ -27,14 +27,25 @@ class IntToken(ConstantSentence):
     pass
 
 
-Statement = namedtuple('Statement', ['terms'])
+class Statement(Sentence, namedtuple('Statement', ['terms'])):
+    pass
 
-Block = namedtuple('Block', ['statements'])
 
-ListStatement = namedtuple('ListStatement', ['values'])
+class Block(Sentence, namedtuple('Block', ['statements'])):
+    pass
 
-Comment = namedtuple('Comment', ['comment_text'])
 
-StringStatement = namedtuple('StringStatement', ['value'])
+class ListStatement(Sentence, namedtuple('ListStatement', ['values'])):
+    pass
 
-ImportStatement = namedtuple('ImportStatement', ['path'])
+
+class Comment(Sentence, namedtuple('Comment', ['comment_text'])):
+    pass
+
+
+class StringStatement(Sentence, namedtuple('StringStatement', ['value'])):
+    pass
+
+
+class ImportStatement(Sentence, namedtuple('ImportStatement', ['path'])):
+    pass
