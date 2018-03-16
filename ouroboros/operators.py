@@ -1,22 +1,14 @@
 from functools import total_ordering
 
+from namedlist import namedtuple
+
 
 @total_ordering
-class Precedence:
-    def __init__(self, label, right_associative=False):
-        self.label = label
-        self.right_associative = right_associative
-
+class Precedence(namedtuple('Precedence', ['label', ('right_associative', False)])):
     def __lt__(self, other):
         if not isinstance(other, Precedence):
             raise TypeError
         return self.label < other.label
-
-    def __eq__(self, other):
-        return type(self) is type(other) and self.label == other.label
-
-    def __repr__(self):
-        return "{}({}, {})".format(self.__class__.__name__, self.label, self.right_associative)
 
 
 class Operator:
