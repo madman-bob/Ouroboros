@@ -2,27 +2,29 @@ from functools import wraps
 
 from toolz import curry
 
-from ouroboros.sentences import Sentence, Identifier, eval_sentence
+from ouroboros.lexer.lexical_tokens import Token, Identifier
 from ouroboros.scope import Scope
 from ouroboros.operators import Precedence
 from ouroboros.expressions import operator_ordering, Expression, eval_expression
 
 
 class ConstantExpression(Expression):
-    def __init__(self, sentence: Sentence, scope: Scope):
-        self.sentence = sentence
+    def __init__(self, token: Token, scope: Scope):
+        self.token = token
         self.scope = scope
 
     def __call__(self):
-        return eval_sentence(self.sentence, self.scope)
+        from ouroboros.eval_sentence import eval_sentence
+
+        return eval_sentence(self.token, self.scope)
 
 
 operator_ordering.insert_start(ConstantExpression)
 
 
 class Variable(Expression):
-    def __init__(self, sentence: Sentence, scope: Scope, precedence=None):
-        self.identifier = sentence
+    def __init__(self, token: Token, scope: Scope, precedence=None):
+        self.identifier = token
         self.scope = scope
         self.precedence = precedence or Precedence(operator_ordering[ConstantExpression])
 
@@ -43,7 +45,8 @@ class FunctionExpression(Expression):
         return cls(func, {}, Identifier(''))
 
     def __call__(self, *args, return_scope=False):
-        from ouroboros.contexts import BlockContext
+        from ouroboros.lexer.lexical_tokens import Block
+        from ouroboros.eval_sentence import eval_sentence
 
         if not args:
             return self
@@ -58,11 +61,11 @@ class FunctionExpression(Expression):
         if isinstance(self.block, (ConstantExpression, Variable, FunctionExpression)):
             self.block.scope = inner_scope
 
-        if isinstance(self.block, BlockContext):
+        if isinstance(self.block, Block):
             value = eval_sentence(self.block, inner_scope).block(())
         elif isinstance(self.block, Expression):
             value = eval_expression(self.block)
-        elif isinstance(self.block, Sentence):
+        elif isinstance(self.block, Token):
             value = eval_sentence(self.block, inner_scope)
         else:
             value = self.block(arg)

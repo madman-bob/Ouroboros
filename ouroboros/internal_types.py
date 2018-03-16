@@ -4,7 +4,7 @@ from toolz import curry
 
 from ouroboros.default_operators import FunctionExpression
 from ouroboros.expressions import eval_expression
-from ouroboros.sentences import Identifier
+from ouroboros.lexer.lexical_tokens import Identifier
 
 
 class ReturnType:
