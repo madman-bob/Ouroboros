@@ -1,6 +1,6 @@
 from ordering import Ordering
 
-from ouroboros.operators import Operator, Precedence
+from ouroboros.operators import Operator, OperatorType, Precedence
 
 from ouroboros.utils import cached_class_property
 
@@ -26,10 +26,12 @@ class Expression:
             return try_get_operator(self(*(unwrap_operator(arg) for arg in args)))
 
         return Operator(
-            self.precedence,
-            func,
-            consumes_previous=self.consumes_previous,
-            consumes_next=self.consumes_next
+            OperatorType(
+                self.precedence,
+                consumes_previous=self.consumes_previous,
+                consumes_next=self.consumes_next
+            ),
+            func
         )
 
     def __call__(self, *args, **kwargs):
