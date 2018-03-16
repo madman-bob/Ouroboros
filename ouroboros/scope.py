@@ -11,7 +11,7 @@ class Scope(MutableMapping[T, S]):
 
     def define(self, key, value):
         if key in self._local_scope or key in self._parent_scope:
-            raise IndexError("Variable {} has already been defined".format(key))
+            raise KeyError("Variable {} has already been defined".format(key))
         self._local_scope[key] = value
 
     def __getitem__(self, key):
@@ -20,7 +20,7 @@ class Scope(MutableMapping[T, S]):
         elif key in self._parent_scope:
             return self._parent_scope[key]
         else:
-            raise IndexError("Variable {} has not been defined".format(key))
+            raise KeyError("Variable {} has not been defined".format(key))
 
     def __setitem__(self, key, value):
         if key in self._local_scope:
@@ -28,7 +28,7 @@ class Scope(MutableMapping[T, S]):
         elif key in self._parent_scope:
             self._parent_scope[key] = value
         else:
-            raise IndexError("Variable {} has not been defined".format(key))
+            raise KeyError("Variable {} has not been defined".format(key))
 
     def __delitem__(self, key):
         if key in self._local_scope:
@@ -36,7 +36,7 @@ class Scope(MutableMapping[T, S]):
         elif key in self._parent_scope:
             del self._parent_scope[key]
         else:
-            raise IndexError("Variable {} has not been defined".format(key))
+            raise KeyError("Variable {} has not been defined".format(key))
 
     def __iter__(self):
         yield from self._local_scope
