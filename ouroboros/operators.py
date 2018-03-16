@@ -1,30 +1,40 @@
 from functools import total_ordering
 
+from namedlist import namedtuple
+
 
 @total_ordering
-class Precedence:
-    def __init__(self, label, right_associative=False):
-        self.label = label
-        self.right_associative = right_associative
-
+class Precedence(namedtuple('Precedence', ['label', ('right_associative', False)])):
     def __lt__(self, other):
         if not isinstance(other, Precedence):
             raise TypeError
         return self.label < other.label
 
-    def __eq__(self, other):
-        return type(self) is type(other) and self.label == other.label
 
-    def __repr__(self):
-        return "{}({}, {})".format(self.__class__.__name__, self.label, self.right_associative)
+@total_ordering
+class OperatorType(namedtuple('OperatorType', ['precedence', ('consumes_previous', False), ('consumes_next', False)])):
+    def __lt__(self, other):
+        if not isinstance(other, OperatorType):
+            raise TypeError
+        return self.precedence < other.precedence
 
 
 class Operator:
-    def __init__(self, precedence, func, consumes_previous=False, consumes_next=False):
-        self.precedence = precedence
+    def __init__(self, operator_type, func):
+        self.operator_type = operator_type
         self.func = func
-        self.consumes_previous = consumes_previous
-        self.consumes_next = consumes_next
+
+    @property
+    def precedence(self):
+        return self.operator_type.precedence
+
+    @property
+    def consumes_previous(self):
+        return self.operator_type.consumes_previous
+
+    @property
+    def consumes_next(self):
+        return self.operator_type.consumes_next
 
     def __call__(self, *args, **kwargs):
         return self.func(*args, **kwargs)
@@ -73,4 +83,4 @@ class Operator:
 
 class BinaryOperator(Operator):
     def __init__(self, precedence, func):
-        super().__init__(precedence, func, consumes_previous=True, consumes_next=True)
+        super().__init__(OperatorType(precedence, consumes_previous=True, consumes_next=True), func)

@@ -1,13 +1,13 @@
 from operator import add, mul
 from unittest import TestCase
 
-from ouroboros.operators import Precedence, Operator, BinaryOperator
+from ouroboros.operators import Precedence, OperatorType, Operator, BinaryOperator
 
 
 class TestOperators(TestCase):
-    str_op = Operator(Precedence(0), str, consumes_next=True)
+    str_op = Operator(OperatorType(Precedence(0), consumes_next=True), str)
 
-    inc_op = Operator(Precedence(0), (lambda a: a + 1), consumes_previous=True)
+    inc_op = Operator(OperatorType(Precedence(0), consumes_previous=True), (lambda a: a + 1))
 
     add_op = BinaryOperator(Precedence(0), add)
     mul_op = BinaryOperator(Precedence(1), mul)
