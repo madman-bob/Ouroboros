@@ -1,7 +1,6 @@
 from unittest import TestCase
 
-from ouroboros.sentences import Identifier, IntToken
-from ouroboros.lexer.lexical_tokens import Statement, Block, ListStatement, Comment, StringStatement, ImportStatement
+from ouroboros.lexer.lexical_tokens import Identifier, IntToken, Statement, Block, ListStatement, Comment, StringStatement, ImportStatement
 from ouroboros.lexer.lexers import StatementLexer, BlockLexer
 
 

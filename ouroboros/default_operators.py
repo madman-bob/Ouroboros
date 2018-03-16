@@ -2,7 +2,7 @@ from functools import wraps
 
 from toolz import curry
 
-from ouroboros.sentences import Sentence, Identifier
+from ouroboros.lexer.lexical_tokens import Sentence, Identifier
 from ouroboros.scope import Scope
 from ouroboros.operators import Precedence
 from ouroboros.expressions import operator_ordering, Expression, eval_expression

@@ -4,10 +4,9 @@ from functools import partial
 from toolz import curry
 
 from ouroboros.scope import Scope
-from ouroboros.sentences import Identifier
 from ouroboros.expressions import Expression, eval_expression
 from ouroboros.internal_types import ReturnType, ObjectType
-from ouroboros.lexer.lexical_tokens import Block
+from ouroboros.lexer.lexical_tokens import Identifier, Block
 from ouroboros.default_operators import Variable, FunctionExpression, PrefixExpression, BinaryExpression
 
 default_scope = Scope()

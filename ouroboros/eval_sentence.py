@@ -1,8 +1,7 @@
 from functools import singledispatch
 
 from ouroboros.scope import Scope
-from ouroboros.sentences import Sentence, Identifier, ConstantSentence, IntToken
-from ouroboros.lexer.lexical_tokens import Statement, Block, ListStatement, Comment, StringStatement, ImportStatement
+from ouroboros.lexer.lexical_tokens import Sentence, Identifier, ConstantSentence, IntToken, Statement, Block, ListStatement, Comment, StringStatement, ImportStatement
 from ouroboros.expressions import try_get_operator, unwrap_operator, Expression
 from ouroboros.internal_types import ReturnType, ListType
 from ouroboros.operators import Operator
