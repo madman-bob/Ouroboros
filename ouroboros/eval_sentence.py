@@ -7,6 +7,7 @@ from ouroboros.lexer.lexical_tokens import Token, Identifier, Constant, IntToken
 from ouroboros.expressions import try_get_operator, unwrap_operator, Expression
 from ouroboros.internal_types import ReturnType, ListType
 from ouroboros.operators import Operator
+from ouroboros.parser.parser import FunctionCall
 from ouroboros.default_operators import ConstantExpression, Variable, FunctionExpression
 
 SemanticToken = namedtuple('SemanticToken', ['token', 'scope'])
@@ -66,6 +67,17 @@ def _(token: Comment, scope: Scope) -> object:
 @eval_sentence.register(StringStatement)
 def _(token: StringStatement, scope: Scope) -> object:
     return token.value
+
+
+@eval_sentence.register(FunctionCall)
+def _(token: FunctionCall, scope: Scope) -> object:
+    func = eval_sentence(token.func, scope)
+
+    result = func
+    for arg in token.args:
+        result = result(SemanticToken(arg, scope))
+
+    return result
 
 
 @singledispatch
