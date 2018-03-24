@@ -3,12 +3,10 @@ from functools import singledispatch
 from namedlist import namedtuple
 
 from ouroboros.scope import Scope
-from ouroboros.lexer.lexical_tokens import Token, Identifier, Constant, IntToken, Statement, Block, ListStatement, Comment, StringStatement, ImportStatement
-from ouroboros.expressions import try_get_operator, unwrap_operator, Expression
+from ouroboros.lexer.lexical_tokens import Token, Identifier, Constant, Block, ListStatement, Comment, StringStatement
+from ouroboros.expressions import Expression
 from ouroboros.internal_types import ReturnType, ListType
-from ouroboros.operators import Operator
 from ouroboros.parser.parser import FunctionCall
-from ouroboros.default_operators import ConstantExpression, Variable, FunctionExpression
 
 SemanticToken = namedtuple('SemanticToken', ['token', 'scope'])
 
@@ -33,25 +31,20 @@ def _(token: Constant, scope: Scope) -> object:
     return token.value
 
 
-@eval_sentence.register(Statement)
-def _(token: Statement, scope: Scope) -> object:
-    expressions = [try_get_operator(get_expression(token, scope)) for token in token.terms if not isinstance(token, Comment)]
-
-    if not expressions:
-        return ()
-
-    return Operator.reduce(expressions)
-
-
 @eval_sentence.register(Block)
 def _(token: Block, scope: Scope) -> object:
-    def call(arg: Expression):
+    def call(arg: Expression, return_scope=False):
+        inner_scope = Scope(parent_scope=scope)
         for subcontext in token.statements:
-            result = eval_sentence(subcontext, scope)
+            result = eval_sentence(subcontext, inner_scope)
             if isinstance(result, ReturnType):
+                if return_scope:
+                    return result.return_value, inner_scope
                 return result.return_value
+        if return_scope:
+            return None, inner_scope
 
-    return FunctionExpression(call, scope, Identifier(''))
+    return call
 
 
 @eval_sentence.register(ListStatement)
@@ -80,35 +73,7 @@ def _(token: FunctionCall, scope: Scope) -> object:
     return result
 
 
-@singledispatch
-def get_expression(token: Token, scope: Scope) -> Expression:
-    raise NotImplementedError("{!r} {!r}".format(token, scope))
-
-
-@get_expression.register(Identifier)
-def _(token: Identifier, scope: Scope) -> Expression:
-    if token in scope:
-        value = eval_sentence(token, scope)
-
-        if isinstance(value, (Expression, Operator)):
-            return Variable(token, scope, precedence=unwrap_operator(value).precedence)
-
-    return Variable(token, scope)
-
-
-@get_expression.register(IntToken)
-@get_expression.register(ListStatement)
-@get_expression.register(StringStatement)
-@get_expression.register(Statement)
-@get_expression.register(ImportStatement)
-def _(token: Token, scope: Scope) -> Expression:
-    return ConstantExpression(token, scope)
-
-
-@get_expression.register(Block)
-def _(token: Block, scope: Scope) -> Expression:
-    return FunctionExpression(token, scope)
-
-
-def eval_semantic_token(token: SemanticToken):
-    return eval_sentence(token.token, token.scope)
+def eval_semantic_token(token):
+    if isinstance(token, SemanticToken):
+        return eval_sentence(token.token, token.scope)
+    return token

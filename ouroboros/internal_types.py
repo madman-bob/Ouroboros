@@ -3,7 +3,6 @@ from functools import reduce
 from toolz import curry
 
 from ouroboros.default_operators import FunctionExpression
-from ouroboros.expressions import eval_expression
 from ouroboros.lexer.lexical_tokens import Identifier
 
 
@@ -24,26 +23,30 @@ class ListType(ObjectType):
     def __init__(self, values):
         self.list = list(values)
 
-        @FunctionExpression.from_python_function
+        @FunctionExpression
         def ou_append(item):
-            self.list.append(eval_expression(item))
+            from ouroboros.eval_sentence import eval_semantic_token
+            self.list.append(eval_semantic_token(item))
 
-        @FunctionExpression.from_python_function
+        @FunctionExpression
         def ou_map(func):
-            return ListType(map(eval_expression(func), self.list))
+            from ouroboros.eval_sentence import eval_semantic_token
+            return ListType(map(eval_semantic_token(func), self.list))
 
-        @FunctionExpression.from_python_function
+        @FunctionExpression
         def ou_filter(func):
-            return ListType(filter(eval_expression(func), self.list))
+            from ouroboros.eval_sentence import eval_semantic_token
+            return ListType(filter(eval_semantic_token(func), self.list))
 
-        @FunctionExpression.from_python_function
+        @FunctionExpression
         @curry
         def ou_reduce(func, initial):
-            func = eval_expression(func)
+            from ouroboros.eval_sentence import eval_semantic_token
+            func = eval_semantic_token(func)
             return reduce(
                 lambda x, y: func(x)(y),
                 self.list,
-                eval_expression(initial)
+                eval_semantic_token(initial)
             )
 
         super().__init__({

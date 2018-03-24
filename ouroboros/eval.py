@@ -4,6 +4,9 @@ from ouroboros.scope import Scope
 from ouroboros.eval_sentence import eval_sentence
 from ouroboros.lexer.lexical_tokens import Identifier, ImportStatement
 from ouroboros.lexer.lexers import StatementLexer, BlockLexer
+from ouroboros.parser.parser import parse_token
+from ouroboros.expressions import Expression
+from ouroboros.default_operators import FunctionExpression
 from ouroboros.internal_types import ObjectType
 from ouroboros.default_scope import default_scope
 
@@ -12,10 +15,21 @@ __all__ = ('ouroboros_eval', 'ouroboros_exec', 'ouroboros_import')
 
 def ouroboros_interpret(interpretation_context, expression_string, **variables):
     token, _ = interpretation_context.parse(expression_string)
-    return eval_sentence(token, Scope(
+
+    scope = Scope(
         local_scope={Identifier(identifier): value for identifier, value in variables.items()},
         parent_scope=default_scope
-    ))
+    )
+
+    operator_types = Scope(parent_scope={
+        key: value.get_operator_type()
+        for key, value in scope.items()
+        if isinstance(value, Expression)
+    })
+
+    token = parse_token(token, operator_types, FunctionExpression.precedence)
+
+    return eval_sentence(token, scope)
 
 
 def ouroboros_eval(expression_string, **variables):

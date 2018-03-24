@@ -2,87 +2,21 @@ from functools import wraps
 
 from toolz import curry
 
-from ouroboros.lexer.lexical_tokens import Token, Identifier
-from ouroboros.scope import Scope
 from ouroboros.operators import Precedence
-from ouroboros.expressions import operator_ordering, Expression, eval_expression
-
-
-class ConstantExpression(Expression):
-    def __init__(self, token: Token, scope: Scope):
-        self.token = token
-        self.scope = scope
-
-    def __call__(self):
-        from ouroboros.eval_sentence import eval_sentence
-
-        return eval_sentence(self.token, self.scope)
-
-
-operator_ordering.insert_start(ConstantExpression)
-
-
-class Variable(Expression):
-    def __init__(self, token: Token, scope: Scope, precedence=None):
-        self.identifier = token
-        self.scope = scope
-        self.precedence = precedence or Precedence(operator_ordering[ConstantExpression])
-
-    def __call__(self):
-        return self.scope[self.identifier]
+from ouroboros.expressions import operator_ordering, Expression
 
 
 class FunctionExpression(Expression):
     consumes_next = True
 
-    def __init__(self, block, scope: Scope, arg_name: Identifier = None):
-        self.block = block
-        self.scope = scope
-        self.arg_name = arg_name
+    def __init__(self, func):
+        self.func = func
 
-    @classmethod
-    def from_python_function(cls, func):
-        return cls(func, {}, Identifier(''))
-
-    def __call__(self, *args, return_scope=False):
-        from ouroboros.lexer.lexical_tokens import Block
-        from ouroboros.eval_sentence import eval_sentence
-
-        if not args:
-            return self
-
-        arg = args[0]
-
-        inner_scope = Scope(parent_scope=self.scope)
-
-        if self.arg_name:
-            inner_scope.define(self.arg_name, eval_expression(arg))
-
-        if isinstance(self.block, (ConstantExpression, Variable, FunctionExpression)):
-            self.block.scope = inner_scope
-
-        if isinstance(self.block, Block):
-            value = eval_sentence(self.block, inner_scope).block(())
-        elif isinstance(self.block, Expression):
-            value = eval_expression(self.block)
-        elif isinstance(self.block, Token):
-            value = eval_sentence(self.block, inner_scope)
-        else:
-            value = self.block(arg)
-
-        if callable(value) and not isinstance(value, Expression):
-            value = FunctionExpression.from_python_function(value)
-
-        if return_scope:
-            return value, inner_scope
-
-        return value
-
-    def __repr__(self):
-        return "{}({!r}, {!r}, {!r})".format(self.__class__.__name__, self.block, self.scope, self.arg_name)
+    def __call__(self, *args, **kwargs):
+        return self.func(*args, **kwargs)
 
 
-operator_ordering.insert_after(ConstantExpression, FunctionExpression)
+operator_ordering.insert_start(FunctionExpression)
 
 
 class PrefixExpression(FunctionExpression):
@@ -115,19 +49,17 @@ class BinaryExpression(Expression):
 
     @classmethod
     def ouroboros_bin_op_from_python_bin_op(cls, func):
+        from ouroboros.eval_sentence import eval_semantic_token
+
         @wraps(func)
+        @curry
         def bin_op(left_expression, right_expression):
-            return func(eval_expression(left_expression), eval_expression(right_expression))
+            return func(eval_semantic_token(left_expression), eval_semantic_token(right_expression))
 
         return bin_op
 
     def __call__(self, *args, **kwargs):
-        value = self.func(*args, **kwargs)
-
-        if callable(value) and not isinstance(value, Expression):
-            return FunctionExpression.from_python_function(value)
-
-        return value
+        return self.func(*args, **kwargs)
 
 
 operator_ordering.insert_before(FunctionExpression, BinaryExpression)
