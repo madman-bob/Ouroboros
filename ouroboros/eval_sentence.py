@@ -1,11 +1,15 @@
 from functools import singledispatch
 
+from namedlist import namedtuple
+
 from ouroboros.scope import Scope
 from ouroboros.lexer.lexical_tokens import Token, Identifier, Constant, IntToken, Statement, Block, ListStatement, Comment, StringStatement, ImportStatement
 from ouroboros.expressions import try_get_operator, unwrap_operator, Expression
 from ouroboros.internal_types import ReturnType, ListType
 from ouroboros.operators import Operator
 from ouroboros.default_operators import ConstantExpression, Variable, FunctionExpression
+
+SemanticToken = namedtuple('SemanticToken', ['token', 'scope'])
 
 
 @singledispatch
@@ -92,3 +96,7 @@ def _(token: Token, scope: Scope) -> Expression:
 @get_expression.register(Block)
 def _(token: Block, scope: Scope) -> Expression:
     return FunctionExpression(token, scope)
+
+
+def eval_semantic_token(token: SemanticToken):
+    return eval_sentence(token.token, token.scope)
