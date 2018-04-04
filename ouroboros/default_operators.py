@@ -1,5 +1,3 @@
-from functools import wraps
-
 from toolz import curry
 
 from ouroboros.operators import Precedence
@@ -45,18 +43,7 @@ class BinaryExpression(Expression):
         return BinaryExpression(func, precedence)
 
     def insert_equiv(self, func):
-        return BinaryExpression(self.ouroboros_bin_op_from_python_bin_op(func), self.precedence)
-
-    @classmethod
-    def ouroboros_bin_op_from_python_bin_op(cls, func):
-        from ouroboros.eval_sentence import eval_semantic_token
-
-        @wraps(func)
-        @curry
-        def bin_op(left_expression, right_expression):
-            return func(eval_semantic_token(left_expression), eval_semantic_token(right_expression))
-
-        return bin_op
+        return BinaryExpression(func, self.precedence)
 
     def __call__(self, *args, **kwargs):
         return self.func(*args, **kwargs)

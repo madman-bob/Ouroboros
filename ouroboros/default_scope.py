@@ -1,5 +1,5 @@
 from operator import add, sub, mul, truediv, pow, mod, is_, eq, ne, lt, le, gt, ge, and_, or_, xor
-from functools import partial
+from functools import partial, wraps
 
 from toolz import curry
 
@@ -8,6 +8,16 @@ from ouroboros.internal_types import ReturnType, ObjectType
 from ouroboros.lexer.lexical_tokens import Identifier, Block
 from ouroboros.eval_sentence import SemanticToken, eval_semantic_token
 from ouroboros.default_operators import FunctionExpression, PrefixExpression, BinaryExpression
+
+
+def ouroboros_bin_op_from_python_bin_op(func):
+    @wraps(func)
+    @curry
+    def bin_op(left_expression, right_expression):
+        return func(eval_semantic_token(left_expression), eval_semantic_token(right_expression))
+
+    return bin_op
+
 
 default_scope = Scope()
 
@@ -43,28 +53,28 @@ def assign(left_expression: SemanticToken, right_expression: SemanticToken):
     return assignment_value
 
 
-ou_add = in_default_scope("+", assign.insert_after(BinaryExpression.ouroboros_bin_op_from_python_bin_op(add)))
-ou_mul = in_default_scope("*", ou_add.insert_after(BinaryExpression.ouroboros_bin_op_from_python_bin_op(mul)))
-ou_pow = in_default_scope("^", ou_mul.insert_after(BinaryExpression.ouroboros_bin_op_from_python_bin_op(pow)))
+ou_add = in_default_scope("+", assign.insert_after(ouroboros_bin_op_from_python_bin_op(add)))
+ou_mul = in_default_scope("*", ou_add.insert_after(ouroboros_bin_op_from_python_bin_op(mul)))
+ou_pow = in_default_scope("^", ou_mul.insert_after(ouroboros_bin_op_from_python_bin_op(pow)))
 
-ou_sub = in_default_scope("-", ou_add.insert_after(BinaryExpression.ouroboros_bin_op_from_python_bin_op(sub)))
-ou_div = in_default_scope("/", ou_mul.insert_after(BinaryExpression.ouroboros_bin_op_from_python_bin_op(truediv)))
+ou_sub = in_default_scope("-", ou_add.insert_after(ouroboros_bin_op_from_python_bin_op(sub)))
+ou_div = in_default_scope("/", ou_mul.insert_after(ouroboros_bin_op_from_python_bin_op(truediv)))
 
-ou_mod = in_default_scope("%", ou_add.insert_before(BinaryExpression.ouroboros_bin_op_from_python_bin_op(mod)))
+ou_mod = in_default_scope("%", ou_add.insert_before(ouroboros_bin_op_from_python_bin_op(mod)))
 
-ou_is = in_default_scope("is", assign.insert_after(BinaryExpression.ouroboros_bin_op_from_python_bin_op(is_)))
-ou_eq = in_default_scope("==", ou_is.insert_equiv(BinaryExpression.ouroboros_bin_op_from_python_bin_op(eq)))
-ou_ne = in_default_scope("!=", ou_eq.insert_equiv(BinaryExpression.ouroboros_bin_op_from_python_bin_op(ne)))
-ou_lt = in_default_scope("<", ou_eq.insert_equiv(BinaryExpression.ouroboros_bin_op_from_python_bin_op(lt)))
-ou_le = in_default_scope("<=", ou_eq.insert_equiv(BinaryExpression.ouroboros_bin_op_from_python_bin_op(le)))
-ou_gt = in_default_scope(">", ou_eq.insert_equiv(BinaryExpression.ouroboros_bin_op_from_python_bin_op(gt)))
-ou_ge = in_default_scope(">=", ou_eq.insert_equiv(BinaryExpression.ouroboros_bin_op_from_python_bin_op(ge)))
+ou_is = in_default_scope("is", assign.insert_after(ouroboros_bin_op_from_python_bin_op(is_)))
+ou_eq = in_default_scope("==", ou_is.insert_equiv(ouroboros_bin_op_from_python_bin_op(eq)))
+ou_ne = in_default_scope("!=", ou_eq.insert_equiv(ouroboros_bin_op_from_python_bin_op(ne)))
+ou_lt = in_default_scope("<", ou_eq.insert_equiv(ouroboros_bin_op_from_python_bin_op(lt)))
+ou_le = in_default_scope("<=", ou_eq.insert_equiv(ouroboros_bin_op_from_python_bin_op(le)))
+ou_gt = in_default_scope(">", ou_eq.insert_equiv(ouroboros_bin_op_from_python_bin_op(gt)))
+ou_ge = in_default_scope(">=", ou_eq.insert_equiv(ouroboros_bin_op_from_python_bin_op(ge)))
 
-ou_contains = in_default_scope("in", ou_eq.insert_equiv(BinaryExpression.ouroboros_bin_op_from_python_bin_op(lambda a, b: a in b)))
+ou_contains = in_default_scope("in", ou_eq.insert_equiv(ouroboros_bin_op_from_python_bin_op(lambda a, b: a in b)))
 
-ou_and = in_default_scope("and", ou_eq.insert_before(BinaryExpression.ouroboros_bin_op_from_python_bin_op(and_)))
-ou_xor = in_default_scope("xor", ou_and.insert_before(BinaryExpression.ouroboros_bin_op_from_python_bin_op(xor)))
-ou_or = in_default_scope("or", ou_and.insert_before(BinaryExpression.ouroboros_bin_op_from_python_bin_op(or_)))
+ou_and = in_default_scope("and", ou_eq.insert_before(ouroboros_bin_op_from_python_bin_op(and_)))
+ou_xor = in_default_scope("xor", ou_and.insert_before(ouroboros_bin_op_from_python_bin_op(xor)))
+ou_or = in_default_scope("or", ou_and.insert_before(ouroboros_bin_op_from_python_bin_op(or_)))
 
 ou_not = in_default_scope("not", FunctionExpression(lambda a: not eval_semantic_token(a)))
 
