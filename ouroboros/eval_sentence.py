@@ -4,7 +4,6 @@ from namedlist import namedtuple
 
 from ouroboros.scope import Scope
 from ouroboros.lexer.lexical_tokens import Token, Identifier, Constant, Block, ListStatement, Comment, StringStatement, FunctionCall
-from ouroboros.expressions import Expression
 from ouroboros.internal_types import ReturnType, ListType
 
 SemanticToken = namedtuple('SemanticToken', ['token', 'scope'])
@@ -32,7 +31,7 @@ def _(token: Constant, scope: Scope) -> object:
 
 @eval_sentence.register(Block)
 def _(token: Block, scope: Scope) -> object:
-    def call(arg: Expression, return_scope=False):
+    def call(arg: SemanticToken, return_scope=False):
         inner_scope = Scope(parent_scope=scope)
         for subcontext in token.statements:
             result = eval_sentence(subcontext, inner_scope)
