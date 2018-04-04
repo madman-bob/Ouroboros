@@ -1,10 +1,10 @@
 from operator import add, sub, mul, truediv, pow, mod, is_, eq, ne, lt, le, gt, ge, and_, or_, xor
-from functools import partial, wraps
+from functools import partial, wraps, reduce
 
 from toolz import curry
 
 from ouroboros.scope import Scope
-from ouroboros.internal_types import ReturnType, ObjectType
+from ouroboros.internal_types import ReturnType, ObjectType, ListType
 from ouroboros.lexer.lexical_tokens import Identifier, Block
 from ouroboros.eval_sentence import SemanticToken, eval_semantic_token
 from ouroboros.default_operators import FunctionExpression, PrefixExpression, BinaryExpression
@@ -25,6 +25,12 @@ default_scope = Scope()
 @curry
 def in_default_scope(variable_name, value):
     default_scope.define(Identifier(variable_name), value)
+    return value
+
+
+@curry
+def class_attribute(object_type, attribute_name, value):
+    object_type.class_attributes.define(Identifier(attribute_name), value)
     return value
 
 
@@ -137,3 +143,32 @@ def object_function(function):
 @curry
 def get_attribute(object: SemanticToken, attribute: SemanticToken):
     return eval_semantic_token(object).attributes[attribute.token]
+
+
+@class_attribute(ListType, "append")
+@curry
+def ou_append(self: ListType, item: SemanticToken):
+    self.list.append(eval_semantic_token(item))
+
+
+@class_attribute(ListType, "map")
+@curry
+def ou_map(self: ListType, func: SemanticToken):
+    return ListType(map(eval_semantic_token(func), self.list))
+
+
+@class_attribute(ListType, "filter")
+@curry
+def ou_filter(self: ListType, func: SemanticToken):
+    return ListType(filter(eval_semantic_token(func), self.list))
+
+
+@class_attribute(ListType, "reduce")
+@curry
+def ou_reduce(self: ListType, func: SemanticToken, initial: SemanticToken):
+    func = eval_semantic_token(func)
+    return reduce(
+        lambda x, y: func(x)(y),
+        self.list,
+        eval_semantic_token(initial)
+    )
