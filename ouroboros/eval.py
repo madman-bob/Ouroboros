@@ -37,7 +37,7 @@ def ouroboros_eval(expression_string, **variables):
 
 
 def ouroboros_exec(expression_string, **variables):
-    return_value, scope = ouroboros_interpret(BlockLexer, expression_string, **variables)((), return_scope=True)
+    return_value, scope = ouroboros_interpret(BlockLexer, expression_string, **variables)(return_scope=True)
 
     if return_value is None:
         return ObjectType(scope)
