@@ -2,8 +2,10 @@ from functools import reduce
 
 from toolz import curry
 
+from ouroboros.scope import Scope
 from ouroboros.default_operators import FunctionExpression
 from ouroboros.lexer.lexical_tokens import Identifier
+from ouroboros.utils import cached_class_property, cached_property
 
 
 class ReturnType:
@@ -12,8 +14,21 @@ class ReturnType:
 
 
 class ObjectType:
+    class_attributes = cached_class_property(lambda cls: Scope())
+
+    @cached_property
+    class bound_class_attributes:
+        def __init__(self, instance):
+            self.instance = instance
+
+        def __getitem__(self, item):
+            return self.instance.class_attributes[item](self.instance)
+
+        def __contains__(self, item):
+            return item in self.instance.class_attributes
+
     def __init__(self, attributes):
-        self.attributes = attributes
+        self.attributes = Scope(attributes, self.bound_class_attributes)
 
     def __str__(self):
         return str(self.attributes)
