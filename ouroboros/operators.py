@@ -72,6 +72,9 @@ class Operator:
             if i == len(iterable) - 1 and op.consumes_next:
                 continue
 
+            if op.consumes_next and i < len(iterable) - 1 and isinstance(iterable[i + 1], Operator) and iterable[i + 1].consumes_previous:
+                continue
+
             if i_max is None or op.precedence > op_max.precedence or op.precedence == op_max.precedence and op.precedence.right_associative:
                 i_max, op_max = i, op
 
