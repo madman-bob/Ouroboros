@@ -1,13 +1,9 @@
 from functools import singledispatch
 
-from namedlist import namedtuple
-
-from ouroboros.lexer.lexical_tokens import Identifier, Statement, Block, ListStatement, Comment
+from ouroboros.lexer.lexical_tokens import Identifier, Statement, Block, ListStatement, Comment, FunctionCall
 from ouroboros.scope import Scope
 from ouroboros.operators import Precedence, OperatorType, Operator
 from ouroboros.parser.precedences import get_operator_type
-
-FunctionCall = namedtuple('FunctionCall', ['func', 'args'])
 
 
 def _operator_func(token, operator_types, default_precedence):

@@ -49,3 +49,7 @@ class StringStatement(Token, namedtuple('StringStatement', ['value'])):
 
 class ImportStatement(Token, namedtuple('ImportStatement', ['path'])):
     pass
+
+
+class FunctionCall(Token, namedtuple('FunctionCall', ['func', 'args'])):
+    pass

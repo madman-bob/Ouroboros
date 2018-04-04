@@ -3,10 +3,9 @@ from functools import singledispatch
 from namedlist import namedtuple
 
 from ouroboros.scope import Scope
-from ouroboros.lexer.lexical_tokens import Token, Identifier, Constant, Block, ListStatement, Comment, StringStatement
+from ouroboros.lexer.lexical_tokens import Token, Identifier, Constant, Block, ListStatement, Comment, StringStatement, FunctionCall
 from ouroboros.expressions import Expression
 from ouroboros.internal_types import ReturnType, ListType
-from ouroboros.parser.parser import FunctionCall
 
 SemanticToken = namedtuple('SemanticToken', ['token', 'scope'])
 

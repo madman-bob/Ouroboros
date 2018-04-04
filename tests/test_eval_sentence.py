@@ -3,8 +3,7 @@ from unittest import TestCase
 from toolz import curry
 
 from ouroboros.scope import Scope
-from ouroboros.lexer.lexical_tokens import Identifier, IntToken, Block
-from ouroboros.parser.parser import FunctionCall
+from ouroboros.lexer.lexical_tokens import Identifier, IntToken, Block, FunctionCall
 from ouroboros.eval_sentence import eval_sentence, eval_semantic_token
 
 
