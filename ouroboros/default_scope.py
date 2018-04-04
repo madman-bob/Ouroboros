@@ -7,7 +7,7 @@ from ouroboros.scope import Scope
 from ouroboros.internal_types import ReturnType, ObjectType, ListType
 from ouroboros.lexer.lexical_tokens import Identifier, Block
 from ouroboros.eval_sentence import SemanticToken, eval_semantic_token
-from ouroboros.default_operators import FunctionExpression, PrefixExpression, BinaryExpression
+from ouroboros.expressions import FunctionExpression, PrefixExpression, BinaryExpression
 
 
 def ouroboros_bin_op_from_python_bin_op(func):
