@@ -7,14 +7,14 @@ from ouroboros.scope import Scope
 from ouroboros.internal_types import ReturnType, ObjectType, ListType
 from ouroboros.lexer.lexical_tokens import Identifier, Block
 from ouroboros.eval_sentence import SemanticToken, eval_semantic_token
-from ouroboros.default_operators import FunctionExpression, PrefixExpression, BinaryExpression
+from ouroboros.expressions import FunctionExpression, PrefixExpression, BinaryExpression
 
 
 def ouroboros_bin_op_from_python_bin_op(func):
     @wraps(func)
     @curry
-    def bin_op(left_expression, right_expression):
-        return func(eval_semantic_token(left_expression), eval_semantic_token(right_expression))
+    def bin_op(left_token: SemanticToken, right_token: SemanticToken):
+        return func(eval_semantic_token(left_token), eval_semantic_token(right_token))
 
     return bin_op
 
@@ -40,22 +40,22 @@ in_default_scope("false", False)
 
 @in_default_scope("print")
 @FunctionExpression
-def inner_print(expression: SemanticToken):
-    print(eval_semantic_token(expression))
+def inner_print(token: SemanticToken):
+    print(eval_semantic_token(token))
 
 
 @in_default_scope("=")
 @BinaryExpression
 @curry
-def assign(left_expression: SemanticToken, right_expression: SemanticToken):
-    if not isinstance(left_expression.token, Identifier):
+def assign(left_token: SemanticToken, right_token: SemanticToken):
+    if not isinstance(left_token.token, Identifier):
         raise TypeError("Trying to assign to non-variable")
 
-    assignment_value = eval_semantic_token(right_expression)
-    if left_expression.token in left_expression.scope:
-        left_expression.scope[left_expression.token] = assignment_value
+    assignment_value = eval_semantic_token(right_token)
+    if left_token.token in left_token.scope:
+        left_token.scope[left_token.token] = assignment_value
     else:
-        left_expression.scope.define(left_expression.token, assignment_value)
+        left_token.scope.define(left_token.token, assignment_value)
     return assignment_value
 
 
