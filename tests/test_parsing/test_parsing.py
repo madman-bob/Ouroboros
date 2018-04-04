@@ -35,6 +35,19 @@ class TestParsing(TestCase):
             FunctionCall(Identifier('+'), [IntToken(1), IntToken(2)])
         )
 
+    def test_binary_operator_function_parsing_interaction(self):
+        self.assertEqual(
+            parse_token(
+                Statement([Identifier('f'), IntToken(1), Identifier('+'), Identifier('f'), IntToken(2)]),
+                self.scope,
+                Precedence(0)
+            ),
+            FunctionCall(Identifier('+'), [
+                FunctionCall(Identifier('f'), [IntToken(1)]),
+                FunctionCall(Identifier('f'), [IntToken(2)])
+            ])
+        )
+
     def test_prefix_parsing(self):
         self.assertEqual(
             parse_token(
