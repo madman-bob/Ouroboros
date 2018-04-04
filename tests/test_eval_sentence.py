@@ -64,7 +64,7 @@ class TestEvalToken(TestCase):
         )
 
         self.assertEqual(scope[Identifier('x')], 1)
-        func(())
+        func()
         self.assertEqual(scope[Identifier('x')], 2)
-        func(())
+        func()
         self.assertEqual(scope[Identifier('x')], 3)

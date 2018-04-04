@@ -84,7 +84,7 @@ ou_not = in_default_scope("not", FunctionExpression(lambda a: not eval_semantic_
 @curry
 def if_statement(condition: SemanticToken, body: SemanticToken):
     if eval_semantic_token(condition):
-        result = eval_semantic_token(body)(())
+        result = eval_semantic_token(body)()
         if result is not None:
             return ReturnType(result)
 
@@ -94,7 +94,7 @@ def if_statement(condition: SemanticToken, body: SemanticToken):
 @curry
 def while_loop(condition: SemanticToken, body: SemanticToken):
     while eval_semantic_token(condition):
-        result = eval_semantic_token(body)(())
+        result = eval_semantic_token(body)()
         if result is not None:
             return ReturnType(result)
 
@@ -121,7 +121,7 @@ def function(argument_name: SemanticToken, body: SemanticToken, arg: SemanticTok
     value = eval_semantic_token(body)
 
     if isinstance(body.token, Block):
-        value = value(())
+        value = value()
 
     return value
 
@@ -129,7 +129,7 @@ def function(argument_name: SemanticToken, body: SemanticToken, arg: SemanticTok
 @in_default_scope("Object")
 @PrefixExpression
 def object_function(function):
-    return ObjectType(eval_semantic_token(function)((), return_scope=True)[1])
+    return ObjectType(eval_semantic_token(function)(return_scope=True)[1])
 
 
 @in_default_scope(".")
