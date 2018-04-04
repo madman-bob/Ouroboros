@@ -17,7 +17,7 @@ class TestInternalTypes(TestCase):
     def test_list_map(self):
         original_list, mapped_list = ouroboros_exec("""
             original_list = [1, 2, 3];
-            mapped_list = original_list.map(x => (x + 1));
+            mapped_list = original_list.map(x => x + 1);
             return [original_list, mapped_list];
         """).list
 
@@ -27,7 +27,7 @@ class TestInternalTypes(TestCase):
     def test_list_filter(self):
         original_list, filtered_list = ouroboros_exec("""
             original_list = [1, 2, 3];
-            filtered_list = original_list.filter(x => (x != 2));
+            filtered_list = original_list.filter(x => x != 2);
             return [original_list, filtered_list];
         """).list
 
@@ -37,7 +37,7 @@ class TestInternalTypes(TestCase):
     def test_list_reduce(self):
         l, item = ouroboros_exec("""
             l = [1, 2, 3];
-            item = l.reduce(x => y => (x + y)) 0;
+            item = l.reduce(x => y => x + y) 0;
             return [l, item];
         """).list
 
