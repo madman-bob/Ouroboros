@@ -32,6 +32,8 @@ def _(token: Constant, scope: Scope) -> object:
 @eval_sentence.register(Block)
 def _(token: Block, scope: Scope) -> object:
     def call(arg: SemanticToken = (), return_scope=False):
+        assert eval_semantic_token(arg) == ()
+
         inner_scope = Scope(parent_scope=scope)
         for subcontext in token.statements:
             result = eval_sentence(subcontext, inner_scope)
