@@ -8,6 +8,7 @@ from ouroboros.parser.parser import FunctionCall, parse_token
 
 class TestParsing(TestCase):
     scope = Scope({
+        Identifier('return'): OperatorType(Precedence(-1), consumes_next=True),
         Identifier('='): OperatorType(Precedence(1), consumes_previous=True, consumes_next=True),
         Identifier('+'): OperatorType(Precedence(2), consumes_previous=True, consumes_next=True),
         Identifier('*'): OperatorType(Precedence(3), consumes_previous=True, consumes_next=True),
@@ -32,6 +33,18 @@ class TestParsing(TestCase):
                 Precedence(0)
             ),
             FunctionCall(Identifier('+'), [IntToken(1), IntToken(2)])
+        )
+
+    def test_prefix_parsing(self):
+        self.assertEqual(
+            parse_token(
+                Statement([Identifier('return'), Identifier('f'), IntToken(1)]),
+                self.scope,
+                Precedence(0)
+            ),
+            FunctionCall(Identifier('return'), [
+                FunctionCall(Identifier('f'), [IntToken(1)])
+            ])
         )
 
     def test_nested_statements(self):
