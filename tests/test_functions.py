@@ -15,7 +15,7 @@ class TestFunctions(TestCase):
     def test_function_arguments_implicit_return(self):
         self.assertEqual(
             ouroboros_eval(
-                'x => (x + 1) 1'
+                '(x => (x + 1)) 1'
             ),
             2
         )
