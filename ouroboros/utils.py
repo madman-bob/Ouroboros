@@ -7,3 +7,6 @@ class cached_class_property(object):
 
     def __get__(self, obj, cls):
         return self.func(cls)
+
+
+cached_property = lambda func: property(memoize(func))
