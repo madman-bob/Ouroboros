@@ -15,6 +15,20 @@ class TestFlowControls(TestCase):
             1
         )
 
+    def test_else(self):
+        for x in range(2):
+            with self.subTest(branch=x):
+                self.assertEqual(
+                    ouroboros_exec("""
+                        if (x == 0) {
+                            return 1;
+                        } else {
+                            return 2;
+                        };
+                    """.replace("x", str(x))),
+                    x + 1
+                )
+
     def test_while(self):
         self.assertEqual(
             ouroboros_exec("""

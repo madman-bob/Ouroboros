@@ -62,13 +62,11 @@ class BinaryExpression(Expression):
 
     @curry
     def insert_before(self, func, right_associative=False):
-        precedence = Precedence(self.precedence.label.insert_before(object()), right_associative=right_associative)
-        return BinaryExpression(func, precedence)
+        return BinaryExpression(func, self.precedence.create_before(right_associative=right_associative))
 
     @curry
     def insert_after(self, func, right_associative=False):
-        precedence = Precedence(self.precedence.label.insert_after(object()), right_associative=right_associative)
-        return BinaryExpression(func, precedence)
+        return BinaryExpression(func, self.precedence.create_after(right_associative=right_associative))
 
     def insert_equiv(self, func):
         return BinaryExpression(func, self.precedence)

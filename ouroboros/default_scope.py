@@ -4,7 +4,7 @@ from functools import partial, wraps, reduce
 from toolz import curry
 
 from ouroboros.scope import Scope
-from ouroboros.internal_types import ReturnType, ObjectType, ListType
+from ouroboros.internal_types import ReturnType, ElseBlock, ObjectType, ListType
 from ouroboros.lexer.lexical_tokens import Identifier, Block
 from ouroboros.eval_sentence import SemanticToken, eval_semantic_token
 from ouroboros.expressions import FunctionExpression, PrefixExpression, BinaryExpression
@@ -89,10 +89,29 @@ ou_not = in_default_scope("not", FunctionExpression(lambda a: not eval_semantic_
 @FunctionExpression
 @curry
 def if_statement(condition: SemanticToken, body: SemanticToken):
-    if eval_semantic_token(condition):
-        result = eval_semantic_token(body)()
-        if result is not None:
-            return ReturnType(result)
+    condition = eval_semantic_token(condition)
+    body = eval_semantic_token(body)
+
+    if isinstance(body, ElseBlock):
+        if condition:
+            result = body.true_block()
+        else:
+            result = body.false_block()
+
+    elif condition:
+        result = body()
+    else:
+        result = None
+
+    if result is not None:
+        return ReturnType(result)
+
+
+@in_default_scope("else")
+@partial(BinaryExpression, precedence=if_statement.precedence.create_after())
+@curry
+def else_block(true_block: SemanticToken, false_block: SemanticToken):
+    return ElseBlock(eval_semantic_token(true_block), eval_semantic_token(false_block))
 
 
 @in_default_scope("while")
