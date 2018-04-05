@@ -10,6 +10,22 @@ class Precedence(namedtuple('Precedence', ['label', ('right_associative', False)
             raise TypeError
         return self.label < other.label
 
+    def create_before(self, label=None, right_associative=False):
+        # Assumes self.label is an ordering.OrderingItem
+
+        if label is None:
+            label = object()
+
+        return Precedence(self.label.insert_before(label), right_associative=right_associative)
+
+    def create_after(self, label=None, right_associative=False):
+        # Assumes self.label is an ordering.OrderingItem
+
+        if label is None:
+            label = object()
+
+        return Precedence(self.label.insert_after(label), right_associative=right_associative)
+
 
 @total_ordering
 class OperatorType(namedtuple('OperatorType', ['precedence', ('consumes_previous', False), ('consumes_next', False)])):
