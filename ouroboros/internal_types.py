@@ -7,6 +7,12 @@ class ReturnType:
         self.return_value = return_value
 
 
+class ElseBlock:
+    def __init__(self, true_block, false_block):
+        self.true_block = true_block
+        self.false_block = false_block
+
+
 class ObjectType:
     class_attributes = cached_class_property(lambda cls: Scope())
 
