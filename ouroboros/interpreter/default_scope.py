@@ -4,10 +4,10 @@ from functools import partial, wraps, reduce
 from toolz import curry
 
 from ouroboros.scope import Scope
-from ouroboros.internal_types import ReturnType, ElseBlock, ObjectType, ListType
+from ouroboros.interpreter.internal_types import ReturnType, ElseBlock, ObjectType, ListType
 from ouroboros.lexer.lexical_tokens import Identifier, Block
-from ouroboros.eval_sentence import SemanticToken, eval_semantic_token
-from ouroboros.expressions import FunctionExpression, PrefixExpression, BinaryExpression
+from ouroboros.interpreter.eval_sentence import SemanticToken, eval_semantic_token
+from ouroboros.interpreter.expressions import FunctionExpression, PrefixExpression, BinaryExpression
 
 
 def ouroboros_bin_op_from_python_bin_op(func):

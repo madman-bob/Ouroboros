@@ -4,7 +4,7 @@ from toolz import curry
 
 from ouroboros.scope import Scope
 from ouroboros.lexer.lexical_tokens import Identifier, IntToken, Block, FunctionCall
-from ouroboros.eval_sentence import eval_sentence, eval_semantic_token
+from ouroboros.interpreter.eval_sentence import eval_sentence, eval_semantic_token
 
 
 class TestEvalToken(TestCase):

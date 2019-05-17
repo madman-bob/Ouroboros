@@ -3,7 +3,7 @@ from functools import singledispatch
 
 from ouroboros.scope import Scope
 from ouroboros.lexer.lexical_tokens import Token, Identifier, Constant, Block, ListStatement, Comment, StringStatement, FunctionCall
-from ouroboros.internal_types import ReturnType, ListType
+from ouroboros.interpreter.internal_types import ReturnType, ListType
 
 
 @dataclass(frozen=True)
