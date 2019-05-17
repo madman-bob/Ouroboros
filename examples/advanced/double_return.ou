@@ -4,10 +4,10 @@ return_if_small = potential_return_value => {
     };
 };
 
-fibonnaci = n => {
+fibonacci = n => {
     return_if_small n;
 
-    return fibonnaci(n - 1) + fibonnaci(n - 2);
+    return fibonacci(n - 1) + fibonacci(n - 2);
 };
 
-print(fibonnaci 10);
+print(fibonacci 10);
