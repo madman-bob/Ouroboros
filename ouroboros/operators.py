@@ -1,26 +1,28 @@
+from dataclasses import dataclass
 from functools import total_ordering
+from typing import Callable
 
-from namedlist import namedtuple
+from ordering import OrderingItem
 
 
 @total_ordering
-class Precedence(namedtuple('Precedence', ['label', ('right_associative', False)])):
+@dataclass(frozen=True)
+class Precedence:
+    label: OrderingItem
+    right_associative: bool = False
+
     def __lt__(self, other):
         if not isinstance(other, Precedence):
             raise TypeError
         return self.label < other.label
 
     def create_before(self, label=None, right_associative=False):
-        # Assumes self.label is an ordering.OrderingItem
-
         if label is None:
             label = object()
 
         return Precedence(self.label.insert_before(label), right_associative=right_associative)
 
     def create_after(self, label=None, right_associative=False):
-        # Assumes self.label is an ordering.OrderingItem
-
         if label is None:
             label = object()
 
@@ -28,17 +30,22 @@ class Precedence(namedtuple('Precedence', ['label', ('right_associative', False)
 
 
 @total_ordering
-class OperatorType(namedtuple('OperatorType', ['precedence', ('consumes_previous', False), ('consumes_next', False)])):
+@dataclass(frozen=True)
+class OperatorType:
+    precedence: Precedence
+    consumes_previous: bool = False
+    consumes_next: bool = False
+
     def __lt__(self, other):
         if not isinstance(other, OperatorType):
             raise TypeError
         return self.precedence < other.precedence
 
 
+@dataclass(frozen=True)
 class Operator:
-    def __init__(self, operator_type, func):
-        self.operator_type = operator_type
-        self.func = func
+    operator_type: OperatorType
+    func: Callable
 
     @property
     def precedence(self):
@@ -100,6 +107,7 @@ class Operator:
         return "{}({!r}, {}, {}, {})".format(self.__class__.__name__, self.precedence, self.func, self.consumes_previous, self.consumes_next)
 
 
+@dataclass(frozen=True)
 class BinaryOperator(Operator):
     def __init__(self, precedence, func):
         super().__init__(OperatorType(precedence, consumes_previous=True, consumes_next=True), func)

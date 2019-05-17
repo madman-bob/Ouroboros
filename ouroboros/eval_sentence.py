@@ -1,12 +1,15 @@
+from dataclasses import dataclass
 from functools import singledispatch
-
-from namedlist import namedtuple
 
 from ouroboros.scope import Scope
 from ouroboros.lexer.lexical_tokens import Token, Identifier, Constant, Block, ListStatement, Comment, StringStatement, FunctionCall
 from ouroboros.internal_types import ReturnType, ListType
 
-SemanticToken = namedtuple('SemanticToken', ['token', 'scope'])
+
+@dataclass(frozen=True)
+class SemanticToken:
+    token: Token
+    scope: Scope
 
 
 @singledispatch

@@ -1,13 +1,16 @@
 from abc import ABCMeta
-
-from namedlist import namedtuple
+from dataclasses import dataclass
+from typing import List
 
 
 class Token(metaclass=ABCMeta):
     pass
 
 
-class Identifier(Token, namedtuple('Identifier', 'name')):
+@dataclass(frozen=True)
+class Identifier(Token):
+    name: str
+
     def __str__(self):
         return self.name
 
@@ -18,38 +21,50 @@ class Identifier(Token, namedtuple('Identifier', 'name')):
         return bool(self.name)
 
 
-class Constant(Token, namedtuple('Constant', 'value')):
+@dataclass(frozen=True)
+class Constant(Token):
+    value: object
+
     def __str__(self):
         return str(self.value)
 
 
+@dataclass(frozen=True)
 class IntToken(Constant):
-    pass
+    value: int
 
 
-class Statement(Token, namedtuple('Statement', ['terms'])):
-    pass
+@dataclass(frozen=True)
+class Statement(Token):
+    terms: List[Token]
 
 
-class Block(Token, namedtuple('Block', ['statements'])):
-    pass
+@dataclass(frozen=True)
+class Block(Token):
+    statements: List[Token]
 
 
-class ListStatement(Token, namedtuple('ListStatement', ['values'])):
-    pass
+@dataclass(frozen=True)
+class ListStatement(Token):
+    values: List[Statement]
 
 
-class Comment(Token, namedtuple('Comment', ['comment_text'])):
-    pass
+@dataclass(frozen=True)
+class Comment(Token):
+    comment_text: str
 
 
-class StringStatement(Token, namedtuple('StringStatement', ['value'])):
-    pass
+@dataclass(frozen=True)
+class StringStatement(Token):
+    value: str
 
 
-class ImportStatement(Token, namedtuple('ImportStatement', ['path'])):
-    pass
+@dataclass(frozen=True)
+class ImportStatement(Token):
+    path: str
 
 
-class FunctionCall(Token, namedtuple('FunctionCall', ['func', 'args'])):
-    pass
+@dataclass(frozen=True)
+class FunctionCall(Token):
+    func: Token
+    args: List[Token]
