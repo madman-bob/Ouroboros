@@ -1,7 +1,7 @@
 from operator import add, mul
 from unittest import TestCase
 
-from ouroboros.operators import Precedence, OperatorType, Operator, BinaryOperator
+from ouroboros.parser.operators import Precedence, OperatorType, Operator, BinaryOperator
 
 
 class TestOperators(TestCase):

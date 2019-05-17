@@ -2,7 +2,7 @@ from toolz import curry
 
 from ordering import Ordering
 
-from ouroboros.operators import OperatorType, Precedence
+from ouroboros.parser.operators import OperatorType, Precedence
 
 from ouroboros.utils import cached_class_property
 

@@ -2,7 +2,7 @@ from functools import singledispatch
 
 from ouroboros.lexer.lexical_tokens import Identifier, Statement, Block, ListStatement, Comment, FunctionCall
 from ouroboros.scope import Scope
-from ouroboros.operators import Precedence, OperatorType, Operator
+from ouroboros.parser.operators import Precedence, OperatorType, Operator
 from ouroboros.parser.precedences import get_operator_type
 
 
