@@ -4,14 +4,14 @@ from toolz import curry
 
 from ouroboros.scope import Scope
 from ouroboros.lexer.lexical_tokens import Identifier, IntToken, Block, FunctionCall
-from ouroboros.eval_sentence import eval_sentence, eval_semantic_token
+from ouroboros.interpreter.eval_sentence import eval_sentence, eval_semantic_token
 
 
 class TestEvalToken(TestCase):
     @staticmethod
     @curry
-    def assign(identifier, value):
-        identifier, scope = identifier
+    def assign(semantic_token, value):
+        identifier, scope = semantic_token.token, semantic_token.scope
         scope[identifier] = eval_semantic_token(value)
 
     def test_eval_constant(self):

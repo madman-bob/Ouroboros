@@ -2,7 +2,7 @@ from functools import singledispatch
 
 from ouroboros.scope import Scope
 from ouroboros.lexer.lexical_tokens import Identifier, Constant
-from ouroboros.operators import Precedence, OperatorType
+from ouroboros.parser.operators import Precedence, OperatorType
 
 
 @singledispatch

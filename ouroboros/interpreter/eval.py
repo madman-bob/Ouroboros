@@ -1,13 +1,13 @@
 from os import path
 
 from ouroboros.scope import Scope
-from ouroboros.eval_sentence import eval_sentence
+from ouroboros.interpreter.eval_sentence import eval_sentence
 from ouroboros.lexer.lexical_tokens import Identifier, ImportStatement
 from ouroboros.lexer.lexers import StatementLexer, BlockLexer
 from ouroboros.parser.parser import parse_token
-from ouroboros.expressions import Expression, FunctionExpression
-from ouroboros.internal_types import ObjectType
-from ouroboros.default_scope import default_scope
+from ouroboros.interpreter.expressions import Expression, FunctionExpression
+from ouroboros.interpreter.internal_types import ObjectType
+from ouroboros.interpreter.default_scope import default_scope
 
 __all__ = ('ouroboros_eval', 'ouroboros_exec', 'ouroboros_import')
 

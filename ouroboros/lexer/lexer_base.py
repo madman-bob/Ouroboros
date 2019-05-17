@@ -1,17 +1,9 @@
 from abc import ABCMeta
-
-from namedlist import namedtuple
+from dataclasses import dataclass
+from typing import Optional, Type
 
 from ouroboros.lexer.chunker import Chunker
 from ouroboros.utils import cached_class_property
-
-ContextSwitch = namedtuple('ContextSwitch', [
-    'start_lexeme',
-    'end_lexeme',
-    'context_class',
-    ('allow_implicit_end', False),
-    ('start_lexeme_is_special', True),
-])
 
 
 class LexerBase(metaclass=ABCMeta):
@@ -71,3 +63,12 @@ class LexerBase(metaclass=ABCMeta):
             end_lexeme = tokens.pop()
 
         return cls.from_tokens(tokens), end_lexeme
+
+
+@dataclass
+class ContextSwitch:
+    start_lexeme: str
+    end_lexeme: Optional[str]
+    context_class: Type[LexerBase]
+    allow_implicit_end: bool = False
+    start_lexeme_is_special: bool = True

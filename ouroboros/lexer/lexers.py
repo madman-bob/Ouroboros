@@ -28,9 +28,6 @@ class StatementLexer(LexerBase):
         else:
             return Identifier(lexeme)
 
-    def __bool__(self):
-        return bool(self.terms)
-
 
 class BlockLexer(LexerBase):
     result_class = Block

@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from ouroboros.lexer.lexical_tokens import Identifier, IntToken, Statement, Block
 from ouroboros.scope import Scope
-from ouroboros.operators import Precedence, OperatorType
+from ouroboros.parser.operators import Precedence, OperatorType
 from ouroboros.parser.parser import FunctionCall, parse_token
 
 
