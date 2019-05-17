@@ -3,7 +3,7 @@ from unittest import TestCase
 from ouroboros import ouroboros_exec
 
 
-class TestFlowControls(TestCase):
+class TestControlFlows(TestCase):
     def test_if(self):
         self.assertEqual(
             ouroboros_exec("""
